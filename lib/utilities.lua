@@ -1,0 +1,35 @@
+local Utility = {}
+
+local boats = {
+    ["minecraft:oak_boat"] = true,
+    ["minecraft:birch_boat"] = true,
+    ["minecraft:spruce_boat"] = true,
+    ["minecraft:jungle_boat"] = true,
+    ["minecraft:dark_oak_boat"] = true,
+    ["minecraft:mangrove_boat"] = true,
+    ["minecraft:cherry_boat"] = true,
+    ["minecraft:pale_oak_boat"] = true,
+}
+
+function Utility.getVehicleType(v)
+    if not v then return "none" end
+
+    local t = v:getType()
+
+    if boats[t] then return "boat" end
+    if t == "minecraft:bamboo_raft" then return "raft" end
+
+    if t == "minecraft:horse" then return "horse" end
+    if t == "minecraft:donkey" then return "donkey" end
+    if t == "minecraft:mule" then return "mule" end
+    if t == "minecraft:camel" then return "camel" end
+
+    if t == "minecraft:pig" then return "pig" end
+    if t == "minecraft:strider" then return "strider" end
+
+    if t == "minecraft:minecart" then return "minecart" end
+
+    return "unknown"
+end
+
+return Utility
