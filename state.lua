@@ -136,6 +136,7 @@ State.Data = {
     isDriving = false,      --?Is now pressed gas or back
 
     --.Stopwatch states
+    autoClock = false,
     isClocking = false,
     currentTime = 0,
     currentLap = 0,

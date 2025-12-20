@@ -151,6 +151,12 @@ function Stopwatch.tick()
         end
     end
 
+    if data.autoClock and obj.ACKEY:isPressed() then 
+        data.isClocking = true
+        data.autoClock = false
+        print("Секундомер запущен")
+    end
+
     if not data.isClocking then return end
 
     data.inCheckBox = isInsideBox(player:getPos())
@@ -170,9 +176,8 @@ function Stopwatch.tick()
         -- Обновить последнее время
         data.lastTime = data.currentTime
 
-        print("§fLap §6" .. data.currentLap ..
-              " §ftime: §a" .. lapMin .. "m" .. lapSecR ..
-              "s. §fTotal: §b" .. totalMin .. "m" .. totalSecR .. "s.")
+        print("§fLap §6" .. data.currentLap .. " §ftime: §a" .. lapMin .. "m" .. lapSecR .. "s. (" .. lapTicks ..
+                " t) §fTotal: §b" .. totalMin .. "m" .. totalSecR .. "s. (" .. data.currentTime .. " t)")
 
         data.currentLap = data.currentLap + 1
     end
