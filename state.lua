@@ -148,7 +148,9 @@ State.Data = {
     inCheckBox = false,
     wasInCheckBox = false,
 
-    renderBox = false
+    renderBox = false,
+
+    lastPreset = 0,
 }
 
 State.Input = {

@@ -40,11 +40,17 @@ function ActionWheel.init()
     end
 
     --.Adding buttons
-    local camHeight = wheels[1]:newAction()
+    local camHeight = wheels[2]:newAction()
         :title("Высота камеры: "..stgs.camHeight.."\n§6Скролл")
         :item("minecraft:observer")
         :setOnScroll(ActionWheel.setCamHeight)
     obj.AW.camHeight = camHeight
+
+    local selectPreset = wheels[2]:newAction()
+        :title("Выбрать пресет зоны секундомера\n§6Скролл")
+        :item("minecraft:flower_banner_pattern")
+        :onScroll(stopwatch.selectPreset)
+    obj.AW.selectPreset = selectPreset
 
     local setBox = wheels[1]:newAction()
         :title(
