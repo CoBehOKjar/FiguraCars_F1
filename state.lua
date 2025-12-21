@@ -136,6 +136,7 @@ State.Data = {
     isDriving = false,      --?Is now pressed gas or back
 
     --.Stopwatch states
+    autoClock = false,
     isClocking = false,
     currentTime = 0,
     currentLap = 0,
@@ -147,7 +148,9 @@ State.Data = {
     inCheckBox = false,
     wasInCheckBox = false,
 
-    renderBox = false
+    renderBox = false,
+
+    lastPreset = 0,
 }
 
 State.Input = {

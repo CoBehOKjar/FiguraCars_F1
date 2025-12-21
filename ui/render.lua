@@ -72,7 +72,7 @@ function Render.spawnEdgeParticles(p1, p2)
         local sz = dz / steps
 
         for i = 0, steps do
-            particles["minecraft:crit"]
+            particles["minecraft:wax_on"]
                 :spawn()
                 :setPos(vec(
                     xa + sx * i,

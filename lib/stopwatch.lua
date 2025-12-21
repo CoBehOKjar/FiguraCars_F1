@@ -1,4 +1,5 @@
 local state = require("state")
+local presets = require("presets")
 local render = require("ui.render")
 
 local Stopwatch = {}
@@ -32,6 +33,24 @@ local function resetBox(pos)
     Stopwatch.setBox(1, pos - vec(1,1,1))
     Stopwatch.setBox(2, pos + vec(1,1,1))
     render.spawnEdgeParticles(data.checkBox[1], data.checkBox[2])
+end
+
+
+
+function Stopwatch.selectPreset(dir)
+    if dir > 0 then
+        data.lastPreset = math.min(data.lastPreset + 1, #presets.Boxes)
+    else
+        data.lastPreset = math.min(data.lastPreset - 1, 1)
+    end
+
+    cbx[1] = presets.Boxes[data.lastPreset].pos[1]
+    cbx[2] = presets.Boxes[data.lastPreset].pos[2]
+
+    render.spawnEdgeParticles(data.checkBox[1], data.checkBox[2])
+    print("Выбран бокс трассы '" .. presets.Boxes[data.lastPreset].name .. "'")
+
+    data.isCheckBoxCreated = true
 end
 
 
@@ -151,6 +170,12 @@ function Stopwatch.tick()
         end
     end
 
+    if data.autoClock and obj.ACKEY:isPressed() then 
+        data.isClocking = true
+        data.autoClock = false
+        print("Секундомер запущен")
+    end
+
     if not data.isClocking then return end
 
     data.inCheckBox = isInsideBox(player:getPos())
@@ -170,9 +195,8 @@ function Stopwatch.tick()
         -- Обновить последнее время
         data.lastTime = data.currentTime
 
-        print("§fLap §6" .. data.currentLap ..
-              " §ftime: §a" .. lapMin .. "m" .. lapSecR ..
-              "s. §fTotal: §b" .. totalMin .. "m" .. totalSecR .. "s.")
+        print("§fLap §6" .. data.currentLap .. " §ftime: §a" .. lapMin .. "m" .. lapSecR .. "s. (" .. lapTicks ..
+                " t) §fTotal: §b" .. totalMin .. "m" .. totalSecR .. "s. (" .. data.currentTime .. " t)")
 
         data.currentLap = data.currentLap + 1
     end

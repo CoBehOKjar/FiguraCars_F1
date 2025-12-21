@@ -40,11 +40,17 @@ function ActionWheel.init()
     end
 
     --.Adding buttons
-    local camHeight = wheels[1]:newAction()
+    local camHeight = wheels[2]:newAction()
         :title("Высота камеры: "..stgs.camHeight.."\n§6Скролл")
         :item("minecraft:observer")
         :setOnScroll(ActionWheel.setCamHeight)
     obj.AW.camHeight = camHeight
+
+    local selectPreset = wheels[2]:newAction()
+        :title("Выбрать пресет зоны секундомера\n§6Скролл")
+        :item("minecraft:flower_banner_pattern")
+        :onScroll(stopwatch.selectPreset)
+    obj.AW.selectPreset = selectPreset
 
     local setBox = wheels[1]:newAction()
         :title(
@@ -62,28 +68,41 @@ function ActionWheel.init()
         :onLeftClick(function() stopwatch.setBox(1, player:getPos(), true) end)
         :onRightClick(function() stopwatch.setBox(2, player:getPos(), true) end)
         :onScroll(stopwatch.changeBox)
-    obj.AW.camHeight = setBox
+    obj.AW.setBox = setBox
 
     local toggleStopwatch = wheels[1]:newAction()
         :title("Запустить/остановить секундомер\n§7ЛКМ/ПКМ")
         :item("minecraft:clock")
         :onLeftClick(function()
             data.isClocking = true
-            print("Таймер запущен")
+            print("Секундомер запущен")
         end)
         :onRightClick(function()
             data.isClocking = false
             data.currentTime = 0
             data.lastTime = 0
-            print("Таймер остановлен")
+            print("Секундомер остановлен")
         end)
-    obj.AW.camHeight = toggleStopwatch
+    obj.AW.toggleStopwatch = toggleStopwatch
 
     local toggleRender = wheels[1]:newAction()
         :title("Постоянный рендер зоны секундомера")
         :item("minecraft:spawner")
         :onToggle(function() ActionWheel.toggleBoxRender(not data.renderBox) end)
-    obj.AW.camHeight = toggleRender
+    obj.AW.toggleRender = toggleRender
+
+    local autoClock = wheels[1]:newAction()
+        :title("Запуск секундомера по газу")
+        :item("minecraft:oak_boat")
+        :onLeftClick(function() 
+            data.autoClock = true 
+            print("Включен запуск секундомера по газу")
+        end)
+        :onRightClick(function() 
+            data.autoClock = false
+            print("Выключен запуск секундомера по газу")
+        end)
+    obj.AW.autoClock = autoClock
 end
 
 
