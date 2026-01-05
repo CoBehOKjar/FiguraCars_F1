@@ -25,6 +25,7 @@ State.Objects = {
     GAS = animations["car.F1"].Gas,
     REVERSE = animations["car.F1"].Reverse,
     STEERING = animations["car.F1"].Steering,
+    EXFIRE = animations["car.F1"].ExhaustFire,
 
     AW = {}
 }

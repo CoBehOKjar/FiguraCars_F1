@@ -33,15 +33,18 @@ local function updateEngine(isAccelerating)
     if data.currentGear < 6 and data.engineRPM >= cfg.SHIFT_UP_RPM then                                                     --?Auto gear up
         data.currentGear = data.currentGear + 1
         data.engineRPM = cfg.SHIFT_UP_TARGET_RPM
+        obj.EXFIRE:play()
     end
 
 
     if data.currentGear > 1 and math.abs(data.speedMps) < cfg.gearShiftDownSpeed[data.currentGear] then                     --?Auto gear down
         local rpmBeforeShift = data.engineRPM
         data.currentGear = data.currentGear - 1
+        obj.EXFIRE:play()
         
         if rpmBeforeShift < cfg.SHIFT_DOWN_BLIP_RPM then                                                                    --?RPM over gas
             data.engineRPM = math.min(cfg.SHIFT_DOWN_BLIP_RPM, cfg.MAX_RPM)
+            obj.EXFIRE:play()
         end
     end
 
