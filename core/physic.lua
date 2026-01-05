@@ -164,7 +164,7 @@ function Physic.tick()
     local vehicle = player:getVehicle()                     --?Getting vehicle type
     local vehicleType = util.getVehicleType(vehicle)
 
-    if vehicleType == "boat" and player:getControlledVehicle() then   --?Model can be used only on boat
+    if vehicleType == "chest_boat" and player:getControlledVehicle() then   --?Model can be used only on boat
         data.inVehicle = true
     else
         data.inVehicle = false

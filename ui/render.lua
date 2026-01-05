@@ -126,9 +126,11 @@ function Render.tick()
 
     --.Camera position update
     if data.inVehicle then    --?Set camera height, what needed, when in car
-        renderer:setCameraPos(0, stgs.camHeight, 0)
+        renderer:offsetCameraPivot(0, stgs.camHeight, 0)
+        renderer:setEyeOffset(0, stgs.camHeight, 0)
     else
         renderer:setCameraPos(0, 0, 0)
+        renderer:setEyeOffset(0, 0, 0)
     end
 end
 

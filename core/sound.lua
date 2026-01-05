@@ -5,8 +5,8 @@ local Sound = {}
 local cfg = state.Config
 local data = state.Data
 
-local engineLoop = sounds["car.EngineLoop"]     --?Sounds path
-local ignitionSound = sounds["car.Ignition"]
+local engineLoop = sounds["car.sounds.EngineLoop"]     --?Sounds path
+local ignitionSound = sounds["car.sounds.Ignition"]
 
 local targetPitch = 1   --?Engine sound target pitch for smooth changing
 local currentPitch = 1  --?Current sound pitch
