@@ -48,7 +48,7 @@ function Stopwatch.selectPreset(dir)
     cbx[2] = presets.Boxes[data.lastPreset].pos[2]
 
     render.spawnEdgeParticles(data.checkBox[1], data.checkBox[2])
-    print("Выбран бокс трассы '" .. presets.Boxes[data.lastPreset].name .. "'")
+    print("Выбран бокс трассы №"..data.lastPreset..": §e'" .. presets.Boxes[data.lastPreset].name .. "'")
 
     data.isCheckBoxCreated = true
 end
@@ -172,8 +172,11 @@ function Stopwatch.tick()
 
     if data.autoClock and obj.ACKEY:isPressed() then 
         data.isClocking = true
+        obj.AW.tglStopwatch:setToggled(true)
+
         data.autoClock = false
-        print("Секундомер запущен")
+        obj.AW.tglAutoClock:setToggled(false)
+        print("Секундомер §2запущен")
     end
 
     if not data.isClocking then return end
