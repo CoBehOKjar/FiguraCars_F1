@@ -151,7 +151,7 @@ State.Data = {
 
     renderBox = false,
 
-    lastPreset = 0,
+    lastPreset = 1,
 }
 
 State.Input = {

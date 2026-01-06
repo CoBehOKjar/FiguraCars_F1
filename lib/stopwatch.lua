@@ -41,7 +41,7 @@ function Stopwatch.selectPreset(dir)
     if dir > 0 then
         data.lastPreset = math.min(data.lastPreset + 1, #presets.Boxes)
     else
-        data.lastPreset = math.min(data.lastPreset - 1, 1)
+        data.lastPreset = math.max(data.lastPreset - 1, 1)
     end
 
     cbx[1] = presets.Boxes[data.lastPreset].pos[1]
