@@ -28,7 +28,7 @@ end
 --*Meme
 function pings.kchau(pos, pitch)
     if player:isLoaded() then
-        sounds:playSound("car.sounds.Kchau", pos, 1, pitch)
+        kchauSound:setPos(pos):setPitch(pitch):play()
     end
 end
 obj.ACTIONKEY.press = function () pings.kchau(player:getPos(), math.random(8, 15) / 10) end
@@ -131,6 +131,7 @@ end
 function Sound.init()
     engineLoop:setLoop(true)
     engineLoop:setAttenuation(5)
+    kchauSound:setAttenuation(5)
 end
 
 
