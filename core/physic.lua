@@ -21,8 +21,8 @@ end
 
 --*Stopping wheels.
 local function stopWheels()
-    if obj.GAS then obj.GAS:stop() end
-    if obj.REVERSE then obj.REVERSE:stop() end
+    if obj.GAS then obj.GAS:setSpeed(0) end
+    if obj.REVERSE then obj.REVERSE:setSpeed(0) end
 end
 
 
@@ -56,11 +56,7 @@ local function updateEngine(isAccelerating)
         data.engineRPM = data.engineRPM + rpmIncrease
     else
         local targetRPM = cfg.IDLE_RPM + (math.abs(data.speedMps) * 50 / cfg.gearRatio[data.currentGear])           --?Decrease RPM when pressed back or all unpressed
-        if data.acceleration < -0.01 and data.engineRPM > targetRPM then
-            data.engineRPM = smooth(data.engineRPM, targetRPM, cfg.RPM_DECEL_RATE)
-        elseif data.engineRPM > cfg.IDLE_RPM then
-            data.engineRPM = data.engineRPM - 100
-        end
+        data.engineRPM = smooth(data.engineRPM, targetRPM, 0.3)
     end
 
     --.Limiter
@@ -88,7 +84,21 @@ local function updateSteering()
 
 
     --.Math
-    local targetAngle = steerInput * cfg.MAX_STEER_ANGLE
+    local targetAngle
+    if steerInput ~= 0 then
+        targetAngle = steerInput * cfg.MAX_STEER_ANGLE
+    else
+        local velocity = player:getVelocity()
+        local flatVel = vec(velocity.x, 0, velocity.z)
+
+        local yaw = math.rad(player:getBodyYaw())
+        local bodyDir = vec(math.sin(yaw), 0, -math.cos(yaw))
+        local rightDir = vec(bodyDir.z, 0, -bodyDir.x)
+
+        local sidewaysSpeed = flatVel:dot(rightDir)
+        targetAngle = math.max(-cfg.MAX_STEER_ANGLE, math.min(cfg.MAX_STEER_ANGLE, sidewaysSpeed * 20))
+    end
+
     data.steerAngle = smooth(data.steerAngle, targetAngle, cfg.STEERING_SMOOTHNESS) --?Smooth changing angle
 
 
@@ -120,8 +130,8 @@ local function updateWheelRotation()
 
 
     if rotationSpeed < 0.01 then    --?If the rotation speed too low, stop the animations and return
-        if obj.GAS then obj.GAS:stop() end
-        if obj.REVERSE then obj.REVERSE:stop() end
+        if obj.GAS then obj.GAS:setSpeed(0) end
+        if obj.REVERSE then obj.REVERSE:setSpeed(0) end
         return
     end
 
