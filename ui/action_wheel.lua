@@ -147,6 +147,7 @@ function ActionWheel.toggleStopwatch(tgl)
     else
         data.isClocking = false
         data.currentTime = 0
+        data.currentLap = 0
         data.lastTime = 0
         print("Секундомер §cостановлен")
     end

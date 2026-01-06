@@ -114,7 +114,10 @@ State.Config = {
 
     --.Sounds
     CAM_MAX_HEIG = 0.5,
-    CAM_MIN_HEIG = -0.9,    
+    CAM_MIN_HEIG = -0.9,
+
+    --...
+    --wait what!?
 }
 
 
