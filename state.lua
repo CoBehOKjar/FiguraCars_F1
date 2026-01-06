@@ -21,6 +21,8 @@ State.Objects = {
     CTRLKEY = keybinds:newKeybind("ResetBox", "key.keyboard.left.control"),
     SHIFTKEY = keybinds:newKeybind("ResetBox", "key.keyboard.left.shift"),
 
+    ACTIONKEY = keybinds:newKeybind("Kchau", "key.keyboard.k"),
+
     --?Animations path
     GAS = animations["car.F1"].Gas,
     REVERSE = animations["car.F1"].Reverse,
