@@ -129,7 +129,7 @@ function Render.tick()
         renderer:offsetCameraPivot(0, stgs.camHeight, 0)
         renderer:setEyeOffset(0, stgs.camHeight, 0)
     else
-        renderer:setCameraPos(0, 0, 0)
+        renderer:offsetCameraPivot(0, 0, 0)
         renderer:setEyeOffset(0, 0, 0)
     end
 end
