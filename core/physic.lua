@@ -62,7 +62,7 @@ local function updateEngine(isAccelerating)
     --.Limiter
     local maxRPM = cfg.MAX_RPM
     if data.inWater then
-        maxRPM = 7000
+        maxRPM = cfg.WATER_MAX_RPM
     end
     data.engineRPM = math.max(cfg.IDLE_RPM, math.min(maxRPM, data.engineRPM))                  --?Limiting max and min RPM
 end

@@ -55,7 +55,12 @@ end
 
 
 
-function Render.spawnEdgeParticles(p1, p2)
+--TODO Сделать ограничение по расстоянию и количеству частиц 
+function Render.spawnEdgeParticles(p1, p2, pos)
+    local center = (p1 + p2) / 2
+    local dist = (pos - center):lengthSquared()
+    if dist > stgs.renderDist then return end
+
     local x1, y1, z1 = p1.x, p1.y, p1.z
     local x2, y2, z2 = p2.x, p2.y, p2.z
 

@@ -17,9 +17,9 @@ State.Objects = {
     LFKEY = keybinds:fromVanilla("key.left"),
     RTKEY = keybinds:fromVanilla("key.right"),
 
-    ALTKEY = keybinds:newKeybind("ResetBox", "key.keyboard.left.alt"),
-    CTRLKEY = keybinds:newKeybind("ResetBox", "key.keyboard.left.control"),
-    SHIFTKEY = keybinds:newKeybind("ResetBox", "key.keyboard.left.shift"),
+    ALTKEY = keybinds:newKeybind("AltM", "key.keyboard.left.alt"),
+    CTRLKEY = keybinds:newKeybind("CtrlM", "key.keyboard.left.control"),
+    SHIFTKEY = keybinds:newKeybind("ShiftM", "key.keyboard.left.shift"),
 
     ACTIONKEY = keybinds:newKeybind("Kchau", "key.keyboard.k"),
 
@@ -73,6 +73,7 @@ State.Config = {
     --.RPM const
     IDLE_RPM = 4000,                    --?RPM when idle
     MAX_RPM = 13000,                    --?RPM up limit
+    WATER_MAX_RPM = 7000,
     RPM_ACCEL_BASE_RATE = 300,          --?RPM acceleration speed
     RPM_DECEL_RATE = 0.3,               --?RPM deceleration speed
     RPM_TO_WHEEL_SPEED_FACTOR = 0.0005, --?RPM to wheels rotation speed multipler
@@ -167,6 +168,7 @@ State.Input = {
 State.Settings = {
     --.Any seetings for action wheel
     camHeight = -0.3,   --?Camera height in car
+    renderDist = 9216,
 }
 
 
