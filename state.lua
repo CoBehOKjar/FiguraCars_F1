@@ -77,7 +77,7 @@ State.Config = {
     RPM_DECEL_RATE = 0.3,               --?RPM deceleration speed
     RPM_TO_WHEEL_SPEED_FACTOR = 0.0005, --?RPM to wheels rotation speed multipler
     COASTING_WHEEL_FACTOR = 0.1,        --?Multipler wheels rotation, when gas unpressed
-    REVERSE_SLOWDOWN_FACTOR = 0.5,      --?Wheels animation speed multiplier when reversing
+    REVERSE_SLOWDOWN_FACTOR = 0.2,      --?Wheels animation speed multiplier when reversing
     
     --.Gear changing RPM
     SHIFT_UP_RPM = 11500,               --?Gear shift up RPM

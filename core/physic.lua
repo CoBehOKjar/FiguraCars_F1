@@ -60,7 +60,11 @@ local function updateEngine(isAccelerating)
     end
 
     --.Limiter
-    data.engineRPM = math.max(cfg.IDLE_RPM, math.min(cfg.MAX_RPM, data.engineRPM))                      --?Limiting max and min RPM
+    local maxRPM = cfg.MAX_RPM
+    if data.inWater then
+        maxRPM = 7000
+    end
+    data.engineRPM = math.max(cfg.IDLE_RPM, math.min(maxRPM, data.engineRPM))                  --?Limiting max and min RPM
 end
 
 
@@ -126,6 +130,10 @@ local function updateWheelRotation()
 
     elseif absSpeed > 0.1 then  --?Inertial motion, when keys unpressed
         rotationSpeed = absSpeed * cfg.COASTING_WHEEL_FACTOR
+    end
+
+    if data.inWater then
+        rotationSpeed = rotationSpeed * 0.3
     end
 
 
@@ -197,14 +205,15 @@ function Physic.tick()
 
 
         data.inWater = vehicle:isInWater()
-
         if data.inWater and not data.wasInWater then
             obj.SWIMMING:play()
+            obj.UNSWIMMING:stop()
         elseif not data.inWater and data.wasInWater then
+            obj.UNSWIMMING:play()
             obj.SWIMMING:stop()
         end
-
         data.wasInWater = data.inWater
+
 
         local velocity = player:getVelocity()                   --?Calc speed and acceleration
         local yaw = math.rad(player:getBodyYaw())               --?Cals directional speed
