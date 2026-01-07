@@ -17,6 +17,7 @@ function events.entity_init()
     obj.Driver:setPrimaryTexture("SKIN")
     obj.DriverFP:setPrimaryTexture("SKIN")
 
+    state.init()
     action_wheel.init()
     sound.init()
 end

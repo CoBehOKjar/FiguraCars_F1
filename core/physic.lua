@@ -109,7 +109,7 @@ end
 
 
 
---*Wheels speed and direction animation uodate
+--*Wheels speed and direction animation update
 local function updateWheelRotation()
     local rotationSpeed = 0
     local absSpeed = math.abs(data.speedMps)
@@ -196,6 +196,15 @@ function Physic.tick()
         end
 
 
+        data.inWater = vehicle:isInWater()
+
+        if data.inWater and not data.wasInWater then
+            obj.SWIMMING:play()
+        elseif not data.inWater and data.wasInWater then
+            obj.SWIMMING:stop()
+        end
+
+        data.wasInWater = data.inWater
 
         local velocity = player:getVelocity()                   --?Calc speed and acceleration
         local yaw = math.rad(player:getBodyYaw())               --?Cals directional speed

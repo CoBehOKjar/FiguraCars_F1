@@ -23,12 +23,6 @@ State.Objects = {
 
     ACTIONKEY = keybinds:newKeybind("Kchau", "key.keyboard.k"),
 
-    --?Animations path
-    GAS = animations["car.F1"].Gas,
-    REVERSE = animations["car.F1"].Reverse,
-    STEERING = animations["car.F1"].Steering,
-    EXFIRE = animations["car.F1"].ExhaustFire,
-
     AW = {}
 }
 
@@ -141,6 +135,9 @@ State.Data = {
     wasInVehicle = false,   --?Is player sitting in wehicle on last tick
     isDriving = false,      --?Is now pressed gas or back
 
+    inWater = false,
+    wasInWater = false,
+
     --.Stopwatch states
     autoClock = false,
     isClocking = false,
@@ -171,5 +168,14 @@ State.Settings = {
     --.Any seetings for action wheel
     camHeight = -0.3,   --?Camera height in car
 }
+
+
+--*Nil protect
+function State.init()
+    --?Initial animations after entity init
+    for k, v in pairs(animations["car.F1"]) do
+        State.Objects[k:upper()] = v
+    end
+end
 
 return State
