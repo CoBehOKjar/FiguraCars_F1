@@ -17,14 +17,11 @@ State.Objects = {
     LFKEY = keybinds:fromVanilla("key.left"),
     RTKEY = keybinds:fromVanilla("key.right"),
 
-    ALTKEY = keybinds:newKeybind("ResetBox", "key.keyboard.left.alt"),
-    CTRLKEY = keybinds:newKeybind("ResetBox", "key.keyboard.left.control"),
-    SHIFTKEY = keybinds:newKeybind("ResetBox", "key.keyboard.left.shift"),
+    ALTKEY = keybinds:newKeybind("AltM", "key.keyboard.left.alt"),
+    CTRLKEY = keybinds:newKeybind("CtrlM", "key.keyboard.left.control"),
+    SHIFTKEY = keybinds:newKeybind("ShiftM", "key.keyboard.left.shift"),
 
-    --?Animations path
-    GAS = animations["car.F1"].Gas,
-    REVERSE = animations["car.F1"].Reverse,
-    STEERING = animations["car.F1"].Steering,
+    ACTIONKEY = keybinds:newKeybind("Kchau", "key.keyboard.k"),
 
     AW = {}
 }
@@ -76,11 +73,12 @@ State.Config = {
     --.RPM const
     IDLE_RPM = 4000,                    --?RPM when idle
     MAX_RPM = 13000,                    --?RPM up limit
+    WATER_MAX_RPM = 7000,
     RPM_ACCEL_BASE_RATE = 300,          --?RPM acceleration speed
     RPM_DECEL_RATE = 0.3,               --?RPM deceleration speed
     RPM_TO_WHEEL_SPEED_FACTOR = 0.0005, --?RPM to wheels rotation speed multipler
     COASTING_WHEEL_FACTOR = 0.1,        --?Multipler wheels rotation, when gas unpressed
-    REVERSE_SLOWDOWN_FACTOR = 0.5,      --?Wheels animation speed multiplier when reversing
+    REVERSE_SLOWDOWN_FACTOR = 0.2,      --?Wheels animation speed multiplier when reversing
     
     --.Gear changing RPM
     SHIFT_UP_RPM = 11500,               --?Gear shift up RPM
@@ -113,7 +111,10 @@ State.Config = {
 
     --.Sounds
     CAM_MAX_HEIG = 0.5,
-    CAM_MIN_HEIG = -0.9,    
+    CAM_MIN_HEIG = -0.9,
+
+    --...
+    --wait what!?
 }
 
 
@@ -135,6 +136,9 @@ State.Data = {
     wasInVehicle = false,   --?Is player sitting in wehicle on last tick
     isDriving = false,      --?Is now pressed gas or back
 
+    inWater = false,
+    wasInWater = false,
+
     --.Stopwatch states
     autoClock = false,
     isClocking = false,
@@ -150,7 +154,7 @@ State.Data = {
 
     renderBox = false,
 
-    lastPreset = 0,
+    lastPreset = 1,
 }
 
 State.Input = {
@@ -164,6 +168,16 @@ State.Input = {
 State.Settings = {
     --.Any seetings for action wheel
     camHeight = -0.3,   --?Camera height in car
+    renderDist = 9216,
 }
+
+
+--*Nil protect
+function State.init()
+    --?Initial animations after entity init
+    for k, v in pairs(animations["car.F1"]) do
+        State.Objects[k:upper()] = v
+    end
+end
 
 return State

@@ -4,9 +4,7 @@ local render = require("ui.render")
 
 local Stopwatch = {}
 
-local cfg = state.Config
 local data = state.Data
-local input = state.Input
 local obj = state.Objects
 
 local cbx = data.checkBox
@@ -32,7 +30,7 @@ end
 local function resetBox(pos)
     Stopwatch.setBox(1, pos - vec(1,1,1))
     Stopwatch.setBox(2, pos + vec(1,1,1))
-    render.spawnEdgeParticles(data.checkBox[1], data.checkBox[2])
+    render.spawnEdgeParticles(cbx[1], cbx[2], pos)
 end
 
 
@@ -41,14 +39,14 @@ function Stopwatch.selectPreset(dir)
     if dir > 0 then
         data.lastPreset = math.min(data.lastPreset + 1, #presets.Boxes)
     else
-        data.lastPreset = math.min(data.lastPreset - 1, 1)
+        data.lastPreset = math.max(data.lastPreset - 1, 1)
     end
 
     cbx[1] = presets.Boxes[data.lastPreset].pos[1]
     cbx[2] = presets.Boxes[data.lastPreset].pos[2]
 
-    render.spawnEdgeParticles(data.checkBox[1], data.checkBox[2])
-    print("Выбран бокс трассы '" .. presets.Boxes[data.lastPreset].name .. "'")
+    render.spawnEdgeParticles(cbx[1], cbx[2], player:getPos())
+    print("Выбран бокс трассы №"..data.lastPreset..": §e'" .. presets.Boxes[data.lastPreset].name .. "'")
 
     data.isCheckBoxCreated = true
 end
@@ -81,7 +79,7 @@ function Stopwatch.setBox(point, pos, expand)
     end
 
     sendToActionbar("§6Текущая область: "..vecToString(cbx[1]).." / "..vecToString(cbx[2]))
-    render.spawnEdgeParticles(data.checkBox[1], data.checkBox[2])
+    render.spawnEdgeParticles(cbx[1], cbx[2], pos)
 
     data.isCheckBoxCreated = true
 end
@@ -128,7 +126,7 @@ function Stopwatch.changeBox(dir)
         cbx[1] = cbx[1] - v
         cbx[2] = cbx[2] + v
         sendToActionbar("§6Текущая область: "..vecToString(cbx[1]).." / "..vecToString(cbx[2]))
-        render.spawnEdgeParticles(data.checkBox[1], data.checkBox[2])
+        render.spawnEdgeParticles(cbx[1], cbx[2], pos)
         return
     end
 
@@ -144,7 +142,7 @@ function Stopwatch.changeBox(dir)
         end
 
         sendToActionbar("§6Текущая область: "..vecToString(cbx[1]).." / "..vecToString(cbx[2]))
-        render.spawnEdgeParticles(data.checkBox[1], data.checkBox[2])
+        render.spawnEdgeParticles(cbx[1], cbx[2], pos)
         return
     end
 
@@ -156,7 +154,7 @@ function Stopwatch.changeBox(dir)
     cbx[1] = cbx[1] - vz
     cbx[2] = cbx[2] + vz
     sendToActionbar("§6Текущая область: "..vecToString(cbx[1]).." / "..vecToString(cbx[2]))
-    render.spawnEdgeParticles(data.checkBox[1], data.checkBox[2])
+    render.spawnEdgeParticles(cbx[1], cbx[2], pos)
 end
 
 
@@ -166,14 +164,17 @@ function Stopwatch.tick()
     --.Chechbox frame render
     if data.renderBox and data.isCheckBoxCreated then
         if world.getTime() % 5 == 0 then
-            render.spawnEdgeParticles(data.checkBox[1], data.checkBox[2])
+            render.spawnEdgeParticles(cbx[1], cbx[2], player:getPos())
         end
     end
 
     if data.autoClock and obj.ACKEY:isPressed() then 
         data.isClocking = true
+        obj.AW.tglStopwatch:setToggled(true)
+
         data.autoClock = false
-        print("Секундомер запущен")
+        obj.AW.tglAutoClock:setToggled(false)
+        print("Секундомер §2запущен")
     end
 
     if not data.isClocking then return end

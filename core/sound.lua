@@ -4,9 +4,11 @@ local Sound = {}
 
 local cfg = state.Config
 local data = state.Data
+local obj = state.Objects
 
-local engineLoop = sounds["car.EngineLoop"]     --?Sounds path
-local ignitionSound = sounds["car.Ignition"]
+local engineLoop = sounds["car.sounds.EngineLoop"]     --?Sounds path
+local ignitionSound = sounds["car.sounds.Ignition"]
+local kchauSound = sounds["car.sounds.Kchau"]
 
 local targetPitch = 1   --?Engine sound target pitch for smooth changing
 local currentPitch = 1  --?Current sound pitch
@@ -23,10 +25,20 @@ local function smooth(a, b, k)
 end
 
 
+--*Meme
+function pings.kchau(pos, pitch)
+    if player:isLoaded() then
+        kchauSound:setPos(pos):setPitch(pitch):play()
+    end
+end
+obj.ACTIONKEY.press = function () pings.kchau(player:getPos(), math.random(8, 15) / 10) end
+
+
 --*Stop engine sound
 function Sound.stopEngine()
     fadeOutActive = true
 end
+
 
 --*For immedantly stop
 function Sound.forceStop()
@@ -68,6 +80,7 @@ end
 
 --*Engine sound properties update
 function Sound.updateEngine(pos)
+    kchauSound:setPos(pos)
     engineLoop:setPos(pos)  --?Updating position
 
 
@@ -109,7 +122,8 @@ function Sound.updateEngine(pos)
             return
         end 
     end
-    engineLoop:setVolume(currentVolume)
+    local waterVolumeFactor = data.inWater and 0.5 or 1.0
+    engineLoop:setVolume(currentVolume * waterVolumeFactor)
 end
 
 
@@ -118,6 +132,7 @@ end
 function Sound.init()
     engineLoop:setLoop(true)
     engineLoop:setAttenuation(5)
+    kchauSound:setAttenuation(5)
 end
 
 

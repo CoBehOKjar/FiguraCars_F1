@@ -15,11 +15,13 @@ end
 function ActionWheel.init()
     --.Creating action wheels
     local wheels = {
-        action_wheel:newPage("Utilities"),
-        action_wheel:newPage("Debug")
+        action_wheel:newPage("Секундомер"),
+        action_wheel:newPage("Утилиты"),
+        action_wheel:newPage("Дебаг"),
     }
 
     action_wheel:setPage(wheels[1]) --?Default active wheel
+
 
     --.Adding navigation buttons to wheels
     for i, wheel in ipairs(wheels) do       --?Calculating next and prevous wheel
@@ -27,31 +29,28 @@ function ActionWheel.init()
         local nextIndex = i % #wheels + 1           --?Next
 
         local nav = wheel:newAction()   --?Creating navigation button
-            :title("< Пред / След >")
-            :item("minecraft:spectral_arrow") --TODO сделать иконки
+            :title("§6< §fПред / След §6>\n§7ПКМ/ЛКМ | Скролл\n§6"..wheel:getTitle())
+            :setTexture(textures["ui.icons.iconPages"], 0, 0, 16, 16)
+            :setHoverTexture(textures["ui.icons.iconPages"], 16, 0, 16, 16)
             :onLeftClick(function()
                 action_wheel:setPage(wheels[prevIndex])
             end)
             :onRightClick(function()
                 action_wheel:setPage(wheels[nextIndex])
             end)
-
+            :setOnScroll(function(dir)
+                if dir > 0 then
+                    action_wheel:setPage(wheels[nextIndex])
+                else
+                    action_wheel:setPage(wheels[prevIndex])
+                end
+            end)
         obj.AW["Nav"..i] = nav
     end
 
+
     --.Adding buttons
-    local camHeight = wheels[2]:newAction()
-        :title("Высота камеры: "..stgs.camHeight.."\n§6Скролл")
-        :item("minecraft:observer")
-        :setOnScroll(ActionWheel.setCamHeight)
-    obj.AW.camHeight = camHeight
-
-    local selectPreset = wheels[2]:newAction()
-        :title("Выбрать пресет зоны секундомера\n§6Скролл")
-        :item("minecraft:flower_banner_pattern")
-        :onScroll(stopwatch.selectPreset)
-    obj.AW.selectPreset = selectPreset
-
+    --.Stopwatch wheel
     local setBox = wheels[1]:newAction()
         :title(
             "Выбрать зону секундомера\n" ..
@@ -64,45 +63,63 @@ function ActionWheel.init()
             "§eCtrl§f+§aShift§f+§6скролл§c - Удалить выделение"
         )
 
-        :item("minecraft:wooden_axe")
+        :setTexture(textures["ui.icons.iconSelect"], 0, 0, 16, 16)
+        :setHoverTexture(textures["ui.icons.iconSelect"], 16, 0, 16, 16)
         :onLeftClick(function() stopwatch.setBox(1, player:getPos(), true) end)
         :onRightClick(function() stopwatch.setBox(2, player:getPos(), true) end)
         :onScroll(stopwatch.changeBox)
     obj.AW.setBox = setBox
 
-    local toggleStopwatch = wheels[1]:newAction()
-        :title("Запустить/остановить секундомер\n§7ЛКМ/ПКМ")
-        :item("minecraft:clock")
-        :onLeftClick(function()
-            data.isClocking = true
-            print("Секундомер запущен")
-        end)
-        :onRightClick(function()
-            data.isClocking = false
-            data.currentTime = 0
-            data.lastTime = 0
-            print("Секундомер остановлен")
-        end)
-    obj.AW.toggleStopwatch = toggleStopwatch
 
-    local toggleRender = wheels[1]:newAction()
-        :title("Постоянный рендер зоны секундомера")
-        :item("minecraft:spawner")
-        :onToggle(function() ActionWheel.toggleBoxRender(not data.renderBox) end)
-    obj.AW.toggleRender = toggleRender
+    local tglRender = wheels[1]:newAction()
+        :title("Постоянный рендер зоны секундомера\n§7ЛКМ")
+        :setTexture(textures["ui.icons.iconBoxRender"], 0, 0, 16, 16)
+        :setHoverTexture(textures["ui.icons.iconBoxRender"], 16, 0, 16, 16)
+        :setToggleTexture(textures["ui.icons.iconBoxRender"], 32, 0, 16, 16)
+        :onToggle(function() ActionWheel.toggleRender(not data.renderBox) end)
+    obj.AW.tglRender = tglRender
+ 
+    
+    local tglAutoClock = wheels[1]:newAction()
+        :title("Запуск секундомера по газу\n§7ЛКМ")
+        :setTexture(textures["ui.icons.iconAutoClock"], 0, 0, 16, 16)
+        :setHoverTexture(textures["ui.icons.iconAutoClock"], 16, 0, 16, 16)
+        :setToggleTexture(textures["ui.icons.iconAutoClock"], 32, 0, 16, 16)
+        :onToggle(function() ActionWheel.toggleAutoClock(not data.autoClock) end)
+    obj.AW.tglAutoClock = tglAutoClock   
 
-    local autoClock = wheels[1]:newAction()
-        :title("Запуск секундомера по газу")
-        :item("minecraft:oak_boat")
-        :onLeftClick(function() 
-            data.autoClock = true 
-            print("Включен запуск секундомера по газу")
-        end)
-        :onRightClick(function() 
-            data.autoClock = false
-            print("Выключен запуск секундомера по газу")
-        end)
-    obj.AW.autoClock = autoClock
+
+    local tglStopwatch = wheels[1]:newAction()
+        :title("Запустить / остановить секундомер\n§7ЛКМ")
+        :setTexture(textures["ui.icons.iconStopwatch"], 0, 0, 16, 16)
+        :setHoverTexture(textures["ui.icons.iconStopwatch"], 16, 0, 16, 16)
+        :setToggleTexture(textures["ui.icons.iconStopwatch"], 32, 0, 16, 16)
+        :onToggle(function () ActionWheel.toggleStopwatch(not data.isClocking) end)
+    obj.AW.tglStopwatch = tglStopwatch
+
+
+    local selectPreset = wheels[1]:newAction()
+        :title("Выбрать пресет зоны секундомера\n§6Скролл")
+        :setTexture(textures["ui.icons.iconPresets"], 0, 0, 16, 16)
+        :setHoverTexture(textures["ui.icons.iconPresets"], 16, 0, 16, 16)
+        :onScroll(stopwatch.selectPreset)
+    obj.AW.selectPreset = selectPreset
+
+
+
+    --.Utilities wheel
+    local camHeight = wheels[2]:newAction()
+        :title("Высота камеры: §e"..stgs.camHeight.."\n§6Скролл")
+        :setTexture(textures["ui.icons.iconCamera"], 0, 0, 16, 16)
+        :setHoverTexture(textures["ui.icons.iconCamera"], 16, 0, 16, 16)
+        :setOnScroll(ActionWheel.setCamHeight)
+    obj.AW.camHeight = camHeight
+
+    --.Debug wheel
+    local tglDebug = wheels[3]:newAction()
+        :title("ПОТОМ\nСкоро\nКогда-нибудь\nЗавтра в 3")
+        :setTexture(textures["ui.icons.iconPotom"], 0, 0, nil, nil, 0.5)
+    obj.AW.camHeight = camHeight
 end
 
 
@@ -114,11 +131,39 @@ function ActionWheel.setCamHeight(dir)
         stgs.camHeight = math.max(stgs.camHeight - 0.05, cfg.CAM_MIN_HEIG)
     end
 
-    ActionWheel.titleUpdate(obj.AW.camHeight, "Высота камеры: "..stgs.camHeight)
+    ActionWheel.titleUpdate(obj.AW.camHeight, "Высота камеры: §e"..stgs.camHeight.."\n§6Скролл")
 end
 
-function ActionWheel.toggleBoxRender(tgl)
+
+function ActionWheel.toggleRender(tgl)
     data.renderBox = tgl
+end
+
+
+function ActionWheel.toggleStopwatch(tgl)
+    if tgl then
+        data.isClocking = true
+        print("Секундомер §2запущен")
+    else
+        data.isClocking = false
+        data.currentTime = 0
+        data.currentLap = 0
+        data.lastTime = 0
+        print("Секундомер §cостановлен")
+    end
+end
+
+function ActionWheel.toggleAutoClock(tgl)
+    if tgl then
+        data.isClocking = false
+        obj.AW.tglStopwatch:setToggled(false)
+
+        data.autoClock = true 
+        print("§2Включен §fзапуск секундомера по газу")
+    else
+        data.autoClock = false
+        print("§cВыключен §fзапуск секундомера по газу")
+    end
 end
 
 return ActionWheel

@@ -8,7 +8,7 @@ local obj = state.Objects
 local stgs = state.Settings
 
 local driverParts = { "LeftLeg", "RightLeg", "LeftArm", "RightArm", "Body" }                                            --?Parts of model for hidding, when in car
-local armorParts = { "LEGGINGS_BODY", "LEGGINGS_LEFT_LEG", "LEGGINGS_RIGHT_LEG", "BOOTS_LEFT_LEG", "BOOTS_RIGHT_LEG"}   --?Parts of vanilla armor for hidding, when in car
+local armorParts = { "LEGGINGS_BODY", "LEGGINGS_LEFT_LEG", "LEGGINGS_RIGHT_LEG", "BOOTS_LEFT_LEG", "BOOTS_RIGHT_LEG", "ELYTRA"}   --?Parts of vanilla armor for hidding, when in car
 local segmentRPM = cfg.MAX_RPM / (#cfg.RPM_UV - 1)        --?RPM in one pixel of indicator on steering wheel
 local hasWheel = models.car.F1.WorldRoot.Car.Frame.SteeringWheel ~= nil     --?Check, what steering wheel exist
 
@@ -55,7 +55,11 @@ end
 
 
 
-function Render.spawnEdgeParticles(p1, p2)
+function Render.spawnEdgeParticles(p1, p2, pos)
+    local center = (p1 + p2) / 2
+    local dist = (pos - center):lengthSquared()
+    if dist > stgs.renderDist then return end
+
     local x1, y1, z1 = p1.x, p1.y, p1.z
     local x2, y2, z2 = p2.x, p2.y, p2.z
 
@@ -126,9 +130,11 @@ function Render.tick()
 
     --.Camera position update
     if data.inVehicle then    --?Set camera height, what needed, when in car
-        renderer:setCameraPos(0, stgs.camHeight, 0)
+        renderer:offsetCameraPivot(0, stgs.camHeight, 0)
+        renderer:setEyeOffset(0, stgs.camHeight, 0)
     else
-        renderer:setCameraPos(0, 0, 0)
+        renderer:offsetCameraPivot(0, 0, 0)
+        renderer:setEyeOffset(0, 0, 0)
     end
 end
 

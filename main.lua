@@ -1,6 +1,5 @@
---TODO Разобраться с отображением фпв
---TODO Разобраться со звуком при ливе
---TODO кчау
+--TODO  Разобраться со звуком при ливе
+--!     Невозможно.
 local state = require("state")
 local stopwatch = require("lib.stopwatch")
 local action_wheel = require("ui.action_wheel")
@@ -17,6 +16,7 @@ function events.entity_init()
     obj.Driver:setPrimaryTexture("SKIN")
     obj.DriverFP:setPrimaryTexture("SKIN")
 
+    state.init()
     action_wheel.init()
     sound.init()
 end
@@ -38,20 +38,3 @@ function events.world_render(delta)
     if not player:isLoaded() then return end
     render.render(delta)
 end
-
-
-
---. Еврейская мудрость
--- local outfitEnabled = false
-
--- function pings.setOutfit(state) -- this state is provided by the host
--- --                  input                 ^
--- --                  vvvvv                 |
---     outfitEnabled = state --              |
--- --  ^^^^^^^^^^^^^                         |
--- --     output                             |
--- end--                                     |
--- --                                        |
--- action:setOnLeftClick(function()--        |
---     pings.setOutfit(not outfitEnabled)----+
--- end)

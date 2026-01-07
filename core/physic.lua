@@ -21,8 +21,8 @@ end
 
 --*Stopping wheels.
 local function stopWheels()
-    if obj.GAS then obj.GAS:stop() end
-    if obj.REVERSE then obj.REVERSE:stop() end
+    if obj.GAS then obj.GAS:setSpeed(0) end
+    if obj.REVERSE then obj.REVERSE:setSpeed(0) end
 end
 
 
@@ -33,15 +33,18 @@ local function updateEngine(isAccelerating)
     if data.currentGear < 6 and data.engineRPM >= cfg.SHIFT_UP_RPM then                                                     --?Auto gear up
         data.currentGear = data.currentGear + 1
         data.engineRPM = cfg.SHIFT_UP_TARGET_RPM
+        obj.EXFIRE:play()
     end
 
 
     if data.currentGear > 1 and math.abs(data.speedMps) < cfg.gearShiftDownSpeed[data.currentGear] then                     --?Auto gear down
         local rpmBeforeShift = data.engineRPM
         data.currentGear = data.currentGear - 1
+        obj.EXFIRE:play()
         
         if rpmBeforeShift < cfg.SHIFT_DOWN_BLIP_RPM then                                                                    --?RPM over gas
             data.engineRPM = math.min(cfg.SHIFT_DOWN_BLIP_RPM, cfg.MAX_RPM)
+            obj.EXFIRE:play()
         end
     end
 
@@ -53,15 +56,15 @@ local function updateEngine(isAccelerating)
         data.engineRPM = data.engineRPM + rpmIncrease
     else
         local targetRPM = cfg.IDLE_RPM + (math.abs(data.speedMps) * 50 / cfg.gearRatio[data.currentGear])           --?Decrease RPM when pressed back or all unpressed
-        if data.acceleration < -0.01 and data.engineRPM > targetRPM then
-            data.engineRPM = smooth(data.engineRPM, targetRPM, cfg.RPM_DECEL_RATE)
-        elseif data.engineRPM > cfg.IDLE_RPM then
-            data.engineRPM = data.engineRPM - 100
-        end
+        data.engineRPM = smooth(data.engineRPM, targetRPM, 0.3)
     end
 
     --.Limiter
-    data.engineRPM = math.max(cfg.IDLE_RPM, math.min(cfg.MAX_RPM, data.engineRPM))                      --?Limiting max and min RPM
+    local maxRPM = cfg.MAX_RPM
+    if data.inWater then
+        maxRPM = cfg.WATER_MAX_RPM
+    end
+    data.engineRPM = math.max(cfg.IDLE_RPM, math.min(maxRPM, data.engineRPM))                  --?Limiting max and min RPM
 end
 
 
@@ -85,7 +88,21 @@ local function updateSteering()
 
 
     --.Math
-    local targetAngle = steerInput * cfg.MAX_STEER_ANGLE
+    local targetAngle
+    if steerInput ~= 0 then
+        targetAngle = steerInput * cfg.MAX_STEER_ANGLE
+    else
+        local velocity = player:getVelocity()
+        local flatVel = vec(velocity.x, 0, velocity.z)
+
+        local yaw = math.rad(player:getBodyYaw())
+        local bodyDir = vec(math.sin(yaw), 0, -math.cos(yaw))
+        local rightDir = vec(bodyDir.z, 0, -bodyDir.x)
+
+        local sidewaysSpeed = flatVel:dot(rightDir)
+        targetAngle = math.max(-cfg.MAX_STEER_ANGLE, math.min(cfg.MAX_STEER_ANGLE, sidewaysSpeed * 20))
+    end
+
     data.steerAngle = smooth(data.steerAngle, targetAngle, cfg.STEERING_SMOOTHNESS) --?Smooth changing angle
 
 
@@ -96,7 +113,7 @@ end
 
 
 
---*Wheels speed and direction animation uodate
+--*Wheels speed and direction animation update
 local function updateWheelRotation()
     local rotationSpeed = 0
     local absSpeed = math.abs(data.speedMps)
@@ -115,10 +132,14 @@ local function updateWheelRotation()
         rotationSpeed = absSpeed * cfg.COASTING_WHEEL_FACTOR
     end
 
+    if data.inWater then
+        rotationSpeed = rotationSpeed * 0.3
+    end
+
 
     if rotationSpeed < 0.01 then    --?If the rotation speed too low, stop the animations and return
-        if obj.GAS then obj.GAS:stop() end
-        if obj.REVERSE then obj.REVERSE:stop() end
+        if obj.GAS then obj.GAS:setSpeed(0) end
+        if obj.REVERSE then obj.REVERSE:setSpeed(0) end
         return
     end
 
@@ -164,7 +185,7 @@ function Physic.tick()
     local vehicle = player:getVehicle()                     --?Getting vehicle type
     local vehicleType = util.getVehicleType(vehicle)
 
-    if vehicleType == "boat" and player:getControlledVehicle() then   --?Model can be used only on boat
+    if vehicleType == "chest_boat" and player:getControlledVehicle() then   --?Model can be used only on boat
         data.inVehicle = true
     else
         data.inVehicle = false
@@ -182,6 +203,16 @@ function Physic.tick()
             lastF, lastB, lastL, lastR = f, b, l, r
         end
 
+
+        data.inWater = vehicle:isInWater()
+        if data.inWater and not data.wasInWater then
+            obj.SWIMMING:play()
+            obj.UNSWIMMING:stop()
+        elseif not data.inWater and data.wasInWater then
+            obj.UNSWIMMING:play()
+            obj.SWIMMING:stop()
+        end
+        data.wasInWater = data.inWater
 
 
         local velocity = player:getVelocity()                   --?Calc speed and acceleration

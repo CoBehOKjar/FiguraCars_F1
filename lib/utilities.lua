@@ -11,13 +11,26 @@ local boats = {
     ["minecraft:pale_oak_boat"] = true,
 }
 
+local chest_boats = {
+    ["minecraft:oak_chest_boat"] = true,
+    ["minecraft:birch_chest_boat"] = true,
+    ["minecraft:spruce_chest_boat"] = true,
+    ["minecraft:jungle_chest_boat"] = true,
+    ["minecraft:dark_oak_chest_boat"] = true,
+    ["minecraft:mangrove_chest_boat"] = true,
+    ["minecraft:cherry_chest_boat"] = true,
+    ["minecraft:pale_oak_chest_boat"] = true,
+}
+
 function Utility.getVehicleType(v)
     if not v then return "none" end
 
     local t = v:getType()
 
     if boats[t] then return "boat" end
+    if chest_boats[t] then return "chest_boat" end
     if t == "minecraft:bamboo_raft" then return "raft" end
+    if t == "minecraft:bamboo_chest_raft" then return "chest_raft" end
 
     if t == "minecraft:horse" then return "horse" end
     if t == "minecraft:donkey" then return "donkey" end
