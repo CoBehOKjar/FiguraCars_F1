@@ -122,7 +122,7 @@ function Sound.updateEngine(pos)
             return
         end 
     end
-    local waterVolumeFactor = data.inWater and 0.6 or 1.0
+    local waterVolumeFactor = data.inWater and 0.5 or 1.0
     engineLoop:setVolume(currentVolume * waterVolumeFactor)
 end
 
