@@ -30,8 +30,8 @@ function ActionWheel.init()
 
         local nav = wheel:newAction()   --?Creating navigation button
             :title("§6< §fПред / След §6>\n§7ПКМ/ЛКМ | Скролл\n§6"..wheel:getTitle())
-            :setTexture(textures["ui.icons.iconPages"], 0, 0, 16, 16)
-            :setHoverTexture(textures["ui.icons.iconPages"], 16, 0, 16, 16)
+            :setTexture(obj.ICO_PAGES, 0, 0, 16, 16)
+            :setHoverTexture(obj.ICO_PAGES, 16, 0, 16, 16)
             :onLeftClick(function()
                 action_wheel:setPage(wheels[prevIndex])
             end)
@@ -63,8 +63,8 @@ function ActionWheel.init()
             "§eCtrl§f+§aShift§f+§6скролл§c - Удалить выделение"
         )
 
-        :setTexture(textures["ui.icons.iconSelect"], 0, 0, 16, 16)
-        :setHoverTexture(textures["ui.icons.iconSelect"], 16, 0, 16, 16)
+        :setTexture(obj.ICO_SELECT, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_SELECT, 16, 0, 16, 16)
         :onLeftClick(function() stopwatch.setBox(1, player:getPos(), true) end)
         :onRightClick(function() stopwatch.setBox(2, player:getPos(), true) end)
         :onScroll(stopwatch.changeBox)
@@ -73,35 +73,35 @@ function ActionWheel.init()
 
     local tglRender = wheels[1]:newAction()
         :title("Постоянный рендер зоны секундомера\n§7ЛКМ")
-        :setTexture(textures["ui.icons.iconBoxRender"], 0, 0, 16, 16)
-        :setHoverTexture(textures["ui.icons.iconBoxRender"], 16, 0, 16, 16)
-        :setToggleTexture(textures["ui.icons.iconBoxRender"], 32, 0, 16, 16)
+        :setTexture(obj.ICO_BOX_RENDER, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_BOX_RENDER, 16, 0, 16, 16)
+        :setToggleTexture(obj.ICO_BOX_RENDER, 32, 0, 16, 16)
         :onToggle(function() ActionWheel.toggleRender(not data.renderBox) end)
     obj.AW.tglRender = tglRender
  
     
     local tglAutoClock = wheels[1]:newAction()
         :title("Запуск секундомера по газу\n§7ЛКМ")
-        :setTexture(textures["ui.icons.iconAutoClock"], 0, 0, 16, 16)
-        :setHoverTexture(textures["ui.icons.iconAutoClock"], 16, 0, 16, 16)
-        :setToggleTexture(textures["ui.icons.iconAutoClock"], 32, 0, 16, 16)
+        :setTexture(obj.ICO_AUTO_CLOCK, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_AUTO_CLOCK, 16, 0, 16, 16)
+        :setToggleTexture(obj.ICO_AUTO_CLOCK, 32, 0, 16, 16)
         :onToggle(function() ActionWheel.toggleAutoClock(not data.autoClock) end)
     obj.AW.tglAutoClock = tglAutoClock   
 
 
     local tglStopwatch = wheels[1]:newAction()
         :title("Запустить / остановить секундомер\n§7ЛКМ")
-        :setTexture(textures["ui.icons.iconStopwatch"], 0, 0, 16, 16)
-        :setHoverTexture(textures["ui.icons.iconStopwatch"], 16, 0, 16, 16)
-        :setToggleTexture(textures["ui.icons.iconStopwatch"], 32, 0, 16, 16)
+        :setTexture(obj.ICO_STOPWATCH, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_STOPWATCH, 16, 0, 16, 16)
+        :setToggleTexture(obj.ICO_STOPWATCH, 32, 0, 16, 16)
         :onToggle(function () ActionWheel.toggleStopwatch(not data.isClocking) end)
     obj.AW.tglStopwatch = tglStopwatch
 
 
     local selectPreset = wheels[1]:newAction()
         :title("Выбрать пресет зоны секундомера\n§6Скролл")
-        :setTexture(textures["ui.icons.iconPresets"], 0, 0, 16, 16)
-        :setHoverTexture(textures["ui.icons.iconPresets"], 16, 0, 16, 16)
+        :setTexture(obj.ICO_PRESETS, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_PRESETS, 16, 0, 16, 16)
         :onScroll(stopwatch.selectPreset)
     obj.AW.selectPreset = selectPreset
 
@@ -110,15 +110,15 @@ function ActionWheel.init()
     --.Utilities wheel
     local camHeight = wheels[2]:newAction()
         :title("Высота камеры: §e"..stgs.camHeight.."\n§6Скролл")
-        :setTexture(textures["ui.icons.iconCamera"], 0, 0, 16, 16)
-        :setHoverTexture(textures["ui.icons.iconCamera"], 16, 0, 16, 16)
+        :setTexture(obj.ICO_CAMERA, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_CAMERA, 16, 0, 16, 16)
         :setOnScroll(ActionWheel.setCamHeight)
     obj.AW.camHeight = camHeight
 
     --.Debug wheel
     local tglDebug = wheels[3]:newAction()
         :title("ПОТОМ\nСкоро\nКогда-нибудь\nЗавтра в 3")
-        :setTexture(textures["ui.icons.iconPotom"], 0, 0, nil, nil, 0.5)
+        :setTexture(obj.ICO_POTOM, 0, 0, nil, nil, 0.5)
     obj.AW.camHeight = camHeight
 end
 

@@ -3,6 +3,8 @@ local State = {}
 
 --*Objects
 State.Objects = {
+    AW = {},
+
     Driver = models.car.F1.Driver,                                                   --?Driver model
     DriverFP = models.car.F1.WorldRoot.DriverFP,                                     --?Driver model for firs person render
     F1 = models.car.F1.WorldRoot,                                                    --?Car model
@@ -23,7 +25,15 @@ State.Objects = {
 
     ACTIONKEY = keybinds:newKeybind("Kchau", "key.keyboard.k"),
 
-    AW = {}
+    --?Textures
+    ICO_PAGES = textures["ui.icons.iconPages"] or textures["car.F1.iconPages"],
+    ICO_SELECT = textures["ui.icons.iconSelect"] or textures["car.F1.iconSelect"],
+    ICO_BOX_RENDER = textures["ui.icons.iconBoxRender"] or textures["car.F1.iconBoxRender"],
+    ICO_AUTO_CLOCK = textures["ui.icons.iconAutoClock"] or textures["car.F1.iconAutoClock"],
+    ICO_STOPWATCH = textures["ui.icons.iconStopwatch"] or textures["car.F1.iconStopwatch"],
+    ICO_PRESETS = textures["ui.icons.iconPresets"] or textures["car.F1.iconPresets"],
+    ICO_CAMERA = textures["ui.icons.iconCamera"] or textures["car.F1.iconCamera"],
+    ICO_POTOM = textures["ui.icons.iconPotom"] or textures["car.F1.iconPotom"],
 }
 
 
