@@ -30,7 +30,7 @@ end
 --*Update engine RPM and gear
 local function updateEngine(isAccelerating)
     --.Gears
-    if data.currentGear < 6 and data.engineRPM >= cfg.SHIFT_UP_RPM then                                                     --?Auto gear up
+    if data.currentGear < #cfg.gearRatio and data.engineRPM >= cfg.SHIFT_UP_RPM then                                                     --?Auto gear up
         data.currentGear = data.currentGear + 1
         data.engineRPM = cfg.SHIFT_UP_TARGET_RPM
         obj.EXFIRE:play()
