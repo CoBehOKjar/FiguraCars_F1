@@ -12,6 +12,7 @@ State.Objects = {
     Units = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUIUnits,    --?Speedometer units display part
     Gear = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUIGear,      --?Speedometer gear display part
     RPM = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUIRPM,        --?Speedometer RPM display part
+    Fuel = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUIFuel,      --?Speedometer Fuel display part
 
     --?Input keys
     ACKEY = keybinds:fromVanilla("key.forward"),

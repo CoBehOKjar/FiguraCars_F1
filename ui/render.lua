@@ -54,6 +54,17 @@ local function updateGear()
 end
 
 
+--*Updating Fuel on speedometer
+local function updateFuel()
+    local fuelNorm = data.fuel / cfg.maxFuel
+    fuelNorm = math.max(0, math.min(1, fuelNorm))
+
+    local fuelY = 0.1 + (1 - 0.1) * fuelNorm
+
+    obj.Fuel:setScale(nil, fuelY, nil)
+end
+
+
 
 function Render.spawnEdgeParticles(p1, p2, pos)
     local center = (p1 + p2) / 2
@@ -106,11 +117,11 @@ end
 
 --*Main tick function
 function Render.tick()
-    host:setActionbar(data.fuel)
     --.Speedometer update
     updateSpeed()
     updateGear()
     updateRPM()
+    updateFuel()
 
 
     --.Model parts visibility update
