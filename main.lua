@@ -1,4 +1,5 @@
 --TODO  Разобраться со звуком при ливе
+--TODO  Система топляка через зоны воронок
 --!     Невозможно.
 local state = require("state")
 local stopwatch = require("lib.stopwatch")

@@ -45,4 +45,21 @@ function Utility.getVehicleType(v)
     return "unknown"
 end
 
+
+
+function Utility.tprint(t, indent)
+    indent = indent or 0
+    local prefix = string.rep("  ", indent)
+
+    for k, v in pairs(t) do
+        if type(v) == "table" then
+            print(prefix .. tostring(k) .. " = {")
+            Utility.tprint(v, indent + 1)
+            print(prefix .. "}")
+        else
+            print(prefix .. tostring(k) .. " = " .. tostring(v))
+        end
+    end
+end
+
 return Utility

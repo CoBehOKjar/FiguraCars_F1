@@ -80,6 +80,13 @@ State.Config = {
         vec(113/128,58/128)
     },
 
+    --?Pit stop blocks
+    REFUEL_BLOCKS = {
+        ["minecraft:black_concrete"] = true,
+        ["minecraft:yellow_concrete"] = true,
+    },
+    maxFuel = 384,  --?Max fuel
+
     --.RPM const
     IDLE_RPM = 4000,                    --?RPM when idle
     MAX_RPM = 13000,                    --?RPM up limit
@@ -131,6 +138,8 @@ State.Config = {
 --*Runtime
 State.Data = {
     --.Car states
+    fuel = 384,             --?Current fuel
+
     engineRPM = 0,          --?Current RPM
     prevEngineRPM = 0,      --?RPM in last tick
     currentGear = 1,        --?Current gear

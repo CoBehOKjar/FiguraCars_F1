@@ -11,6 +11,7 @@ local obj = state.Objects
 
 local lastF, lastB, lastL, lastR = false, false, false, false   --?Pressed keys in last tick
 
+local BOAT_RADIUS = 1.375 / 2
 
 
 --*Function for smooth change of values
@@ -23,6 +24,54 @@ end
 local function stopWheels()
     if obj.GAS then obj.GAS:setSpeed(0) end
     if obj.REVERSE then obj.REVERSE:setSpeed(0) end
+end
+
+
+--*Return block id in coords
+local function blockIdAt(x, y, z)
+    return world.getBlockState(vec(math.floor(x), math.floor(y), math.floor(z))):getID()
+end
+
+
+--*Check block and entity under boat
+local function underBoat(vehicle)
+    local pos = vehicle:getPos()
+
+    local x1 = pos.x - BOAT_RADIUS
+    local z1 = pos.z - BOAT_RADIUS
+    local x2 = pos.x + BOAT_RADIUS
+    local z2 = pos.z + BOAT_RADIUS
+
+    local y1 = pos.y - 1
+    local y2 = pos.y + 1
+
+    --.Check hopper minecart
+    local ents = world.getEntities(x1, y1, z1, x2, y2, z2)
+    for _, e in pairs(ents) do
+        if e and e.getType and e:getType() == "minecraft:hopper_minecart" then
+            return "hopped"
+        end
+    end
+
+    --.Check pit block
+    local checkY = pos.y - 1.0
+
+    local r = BOAT_RADIUS
+    local step = r
+
+    for ix = -1, 1 do
+        for iz = -1, 1 do
+            local px = pos.x + ix * step
+            local pz = pos.z + iz * step
+
+            local id = blockIdAt(px, checkY, pz)
+            if cfg.REFUEL_BLOCKS[id] then
+                return "refueled"
+            end
+        end
+    end
+
+    return nil
 end
 
 
@@ -191,7 +240,6 @@ function Physic.tick()
         data.inVehicle = false
     end
 
-
     --.Calculating updates
     if data.inVehicle then
         local f = obj.ACKEY:isPressed()                         --?Check pressed keys
@@ -228,6 +276,15 @@ function Physic.tick()
         updateEngine(input.accelState)                  --?Updates
         updateSteering()
         updateWheelRotation()
+
+        local status = underBoat(vehicle)
+        if status == "hopped" then
+            data.fuel = data.fuel - 1
+            
+        elseif status == "refueled" then
+            data.fuel = cfg.maxFuel
+        end
+
         models.car.F1:setPos(0, 8, 0)
     else
         obj.STEERING:stop()

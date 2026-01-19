@@ -106,6 +106,7 @@ end
 
 --*Main tick function
 function Render.tick()
+    host:setActionbar(data.fuel)
     --.Speedometer update
     updateSpeed()
     updateGear()
