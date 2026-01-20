@@ -10,7 +10,7 @@ local stgs = state.Settings
 local driverParts = { "LeftLeg", "RightLeg", "LeftArm", "RightArm", "Body" }                                            --?Parts of model for hidding, when in car
 local armorParts = { "LEGGINGS_BODY", "LEGGINGS_LEFT_LEG", "LEGGINGS_RIGHT_LEG", "BOOTS_LEFT_LEG", "BOOTS_RIGHT_LEG", "ELYTRA"}   --?Parts of vanilla armor for hidding, when in car
 local segmentRPM = cfg.MAX_RPM / (#cfg.RPM_UV - 1)        --?RPM in one pixel of indicator on steering wheel
-local hasWheel = models.car.F1.WorldRoot.Car.Frame.SteeringWheel ~= nil     --?Check, what steering wheel exist
+local hasWheel = obj.Tens and obj.Units and obj.Gear and obj.RPM and obj.Fuel     --?Check, what steering wheel exist
 
 
 
@@ -61,7 +61,9 @@ local function updateFuel()
 
     local fuelY = 0.1 + (1 - 0.1) * fuelNorm
 
-    obj.Fuel:setScale(nil, fuelY, nil)
+    if hasWheel then
+        obj.Fuel:setScale(nil, fuelY, nil)
+    end
 end
 
 
@@ -117,13 +119,6 @@ end
 
 --*Main tick function
 function Render.tick()
-    --.Speedometer update
-    updateSpeed()
-    updateGear()
-    updateRPM()
-    updateFuel()
-
-
     --.Model parts visibility update
     obj.F1:setVisible(data.inVehicle)                 --?Show car
     renderer:setRenderVehicle(not data.inVehicle) --?And hide boat
@@ -140,9 +135,15 @@ function Render.tick()
     vanilla_model.CAPE:setVisible(driverVisible)            --?And cape
     
 
-    --.Camera position update
-    if data.inVehicle then    --?Set camera height, what needed, when in car
-        renderer:offsetCameraPivot(0, stgs.camHeight, 0)
+    if data.inVehicle then
+        --.Speedometer update
+        updateSpeed()
+        updateGear()
+        updateRPM()
+        updateFuel()
+        
+        --.Camera position update
+        renderer:offsetCameraPivot(0, stgs.camHeight, 0)    --?Set camera height, what needed, when in car
         renderer:setEyeOffset(0, stgs.camHeight, 0)
     else
         renderer:offsetCameraPivot(0, 0, 0)

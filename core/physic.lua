@@ -251,9 +251,11 @@ function Physic.tick()
         if data.inWater and not data.wasInWater then
             obj.SWIMMING:play()
             obj.UNSWIMMING:stop()
+            util.dbgEvent("PHS", "Swiming: §9"..tostring(data.inWater))
         elseif not data.inWater and data.wasInWater then
             obj.UNSWIMMING:play()
             obj.SWIMMING:stop()
+            util.dbgEvent("PHS", "Swiming: §9"..tostring(data.inWater))
         end
         data.wasInWater = data.inWater
 
@@ -274,7 +276,11 @@ function Physic.tick()
 
         if host:isHost() then
             local status = underBoat(vehicle)
-            util.dbg("under", "Fuel is: §9"..tostring(status))
+            if status ~= data.lastUnderStatus then
+                util.dbgEvent("PHS", "Under: "..tostring(status))
+                data.lastUnderStatus = status
+            end
+            util.dbgTick({U = status})
 
             if status == "hopped" then
                 data.fuel = math.max(0, data.fuel - 1)
@@ -294,6 +300,20 @@ function Physic.tick()
     end
 
     sound.tick()
+
+    if data.inVehicle ~= data.wasInVehicle then
+        util.dbgEvent("PHS", "In boat: §9"..tostring(data.inVehicle))
+    end
+
+    util.dbgTick({
+        S = string.format("%.2f", data.speedMps),
+        G = data.currentGear,
+        R = math.floor(data.engineRPM),
+        F = data.fuel,
+        W = data.inWater,
+        A = string.format("%.2f", data.acceleration),
+        I = (input.accelState and "W" or "-")..(input.backState and "S" or "-")..(input.leftState and "A" or "-")..(input.rightState and "D" or "-")
+    })
 
     data.wasInVehicle = data.inVehicle
     data.prevSpeedMps = data.speedMps

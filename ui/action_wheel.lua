@@ -1,5 +1,6 @@
 local state = require("state")
 local stopwatch = require("lib.stopwatch")
+local util = require("lib.utilities")
 
 local ActionWheel = {}
 
@@ -34,15 +35,19 @@ function ActionWheel.init()
             :setHoverTexture(obj.ICO_PAGES, 16, 0, 16, 16)
             :onLeftClick(function()
                 action_wheel:setPage(wheels[prevIndex])
+                util.dbgEvent("AW", "Perv page")
             end)
             :onRightClick(function()
                 action_wheel:setPage(wheels[nextIndex])
+                util.dbgEvent("AW", "Next page")
             end)
             :setOnScroll(function(dir)
                 if dir > 0 then
                     action_wheel:setPage(wheels[nextIndex])
+                    util.dbgEvent("AW", "Next page")
                 else
                     action_wheel:setPage(wheels[prevIndex])
+                    util.dbgEvent("AW", "Perv page")
                 end
             end)
         obj.AW["Nav"..i] = nav
@@ -76,7 +81,10 @@ function ActionWheel.init()
         :setTexture(obj.ICO_BOX_RENDER, 0, 0, 16, 16)
         :setHoverTexture(obj.ICO_BOX_RENDER, 16, 0, 16, 16)
         :setToggleTexture(obj.ICO_BOX_RENDER, 32, 0, 16, 16)
-        :onToggle(function() data.renderBox = not data.renderBox end)
+        :onToggle(function()
+            data.renderBox = not data.renderBox
+            util.dbgEvent("AW", "Toggled box render")
+        end)
     obj.AW.tglRender = tglRender
  
     
@@ -85,7 +93,7 @@ function ActionWheel.init()
         :setTexture(obj.ICO_AUTO_CLOCK, 0, 0, 16, 16)
         :setHoverTexture(obj.ICO_AUTO_CLOCK, 16, 0, 16, 16)
         :setToggleTexture(obj.ICO_AUTO_CLOCK, 32, 0, 16, 16)
-        :onToggle(function() ActionWheel.toggleAutoClock(not data.autoClock) end)
+        :onToggle(function()ActionWheel.toggleAutoClock(not data.autoClock) end)
     obj.AW.tglAutoClock = tglAutoClock   
 
 
@@ -112,17 +120,25 @@ function ActionWheel.init()
         :title("Высота камеры: §e"..stgs.camHeight.."\n§6Скролл")
         :setTexture(obj.ICO_CAMERA, 0, 0, 16, 16)
         :setHoverTexture(obj.ICO_CAMERA, 16, 0, 16, 16)
-        :setOnScroll(ActionWheel.setCamHeight)
+        :onScroll(ActionWheel.setCamHeight)
     obj.AW.camHeight = camHeight
 
 
     
     --.Debug wheel
-    local tglDebug = wheels[3]:newAction()
-        :title("Debug\n§7ЛКМ/ПКМ")
+    local tglDebugEvent = wheels[3]:newAction()
+        :title("Debug event\n§7LMB")
         :setTexture(obj.ICO_POTOM, 0, 0, nil, nil, 0.5)
-        :onToggle(function () ActionWheel.toggleDebug(not stgs.debug) end)
-    obj.AW.tglDebug = tglDebug
+        :onToggle(function () ActionWheel.toggleDebugEvent(not stgs.debugEvent) end)
+    obj.AW.tglDebugEvent = tglDebugEvent
+
+
+    local tglDebugTick = wheels[3]:newAction()
+        :title("Debug tick\n§7LMB §f- Toggle\n§6Scroll §f- Change output between chat & actionbar")
+        :setTexture(obj.ICO_POTOM, 0, 0, nil, nil, 0.5)
+        :onToggle(function () ActionWheel.toggleDebugTick(not stgs.debugTick) end)
+        :onScroll(ActionWheel.changeDebugTickOutput)
+    obj.AW.tglDebugTick = tglDebugTick
 end
 
 
@@ -135,6 +151,7 @@ function ActionWheel.setCamHeight(dir)
     end
 
     ActionWheel.titleUpdate(obj.AW.camHeight, "Высота камеры: §e"..stgs.camHeight.."\n§6Скролл")
+    util.dbgEvent("AW", "Changed camera height to §9"..tostring(stgs.camHeight))
 end
 
 
@@ -149,6 +166,7 @@ function ActionWheel.toggleStopwatch(tgl)
         data.lastTime = 0
         print("Секундомер §cостановлен")
     end
+    util.dbgEvent("AW", "Toggled stopwatch to §9"..tostring(data.isClocking))
 end
 
 
@@ -163,17 +181,39 @@ function ActionWheel.toggleAutoClock(tgl)
         data.autoClock = false
         print("§cВыключен §fзапуск секундомера по газу")
     end
+    util.dbgEvent("AW", "Toggled autoclock to §9"..tostring(data.autoClock))
 end
 
 
-function ActionWheel.toggleDebug(tgl)
+function ActionWheel.toggleDebugEvent(tgl)
     if tgl then
-        stgs.debug = true
-        print("Debug is §2ON")
+        stgs.debugEvent = true
     else
-        stgs.debug = false
-        print("Debug is §cOFF")
+        stgs.debugEvent = false
     end
+    util.dbgEvent("AW", "Toggled debug event to §9"..tostring(stgs.debugEvent))
+end
+
+
+function ActionWheel.toggleDebugTick(tgl)
+    if tgl then
+        stgs.debugTick = true
+    else
+        stgs.debugTick = false
+    end
+    util.dbgEvent("AW", "Toggled debug tick to §9"..tostring(stgs.debugTick))
+end
+
+
+function ActionWheel.changeDebugTickOutput(dir)
+    if dir > 0 then
+        stgs.debugTickTo = "ab"
+        print("Debug tick sending to §dactionbar")
+    else
+        stgs.debugTickTo = "ch"
+        print("Debug tick sending to §dchat")
+    end
+    util.dbgEvent("AW", "Debug tick outout changed to §9"..tostring(stgs.debugTickTo))
 end
 
 return ActionWheel

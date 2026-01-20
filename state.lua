@@ -140,6 +140,7 @@ State.Config = {
 State.Data = {
     --.Car states
     fuel = 384,             --?Current fuel
+    lastUnderStatus = nil,
 
     engineRPM = 0,          --?Current RPM
     prevEngineRPM = 0,      --?RPM in last tick
@@ -189,7 +190,9 @@ State.Settings = {
     --.Any seetings for action wheel
     camHeight = -0.3,   --?Camera height in car
     renderDist = 9216,
-    debug = false,
+    debugEvent = false,
+    debugTick = false,
+    debugTickTo = "ab", --?ab to actionbar, ch to chat
 }
 
 

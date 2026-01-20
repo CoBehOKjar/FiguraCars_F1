@@ -6,6 +6,7 @@ local action_wheel = require("ui.action_wheel")
 local render = require("ui.render")
 local physic = require("core.physic")
 local sound = require("core.sound")
+local util = require("lib.utilities")
 
 
 local obj = state.Objects
@@ -29,6 +30,8 @@ function events.tick()
     physic.tick()
     render.tick()
     stopwatch.tick()
+
+    util.dbgTickFlush()
 end
 
 
