@@ -1,4 +1,5 @@
 local state = require("state")
+local util = require("lib.utilities")
 
 local Sound = {}
 
@@ -18,11 +19,6 @@ local isEnginePlaying = false   --?Current engine sound state
 local fadeOutActive = false     --?Fade out engine volume, when exit from vehicle
 local fadeSpeed = 0.08          --?Speed of fade out
 
-
---*Smooth.
-local function smooth(a, b, k)
-    return a + (b - a) * k
-end
 
 
 --*Meme
@@ -108,7 +104,7 @@ function Sound.updateEngine(pos)
         targetPitch = targetPitch * dopplerFactor
     end
 
-    currentPitch = smooth(currentPitch, targetPitch, 0.2)
+    currentPitch = util.smooth(currentPitch, targetPitch, 0.2)
     engineLoop:setPitch(currentPitch)
 
 

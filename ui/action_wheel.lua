@@ -76,7 +76,7 @@ function ActionWheel.init()
         :setTexture(obj.ICO_BOX_RENDER, 0, 0, 16, 16)
         :setHoverTexture(obj.ICO_BOX_RENDER, 16, 0, 16, 16)
         :setToggleTexture(obj.ICO_BOX_RENDER, 32, 0, 16, 16)
-        :onToggle(function() ActionWheel.toggleRender(not data.renderBox) end)
+        :onToggle(function() data.renderBox = not data.renderBox end)
     obj.AW.tglRender = tglRender
  
     
@@ -115,11 +115,14 @@ function ActionWheel.init()
         :setOnScroll(ActionWheel.setCamHeight)
     obj.AW.camHeight = camHeight
 
+
+    
     --.Debug wheel
     local tglDebug = wheels[3]:newAction()
-        :title("ПОТОМ\nСкоро\nКогда-нибудь\nЗавтра в 3")
+        :title("Debug\n§7ЛКМ/ПКМ")
         :setTexture(obj.ICO_POTOM, 0, 0, nil, nil, 0.5)
-    obj.AW.camHeight = camHeight
+        :onToggle(function () ActionWheel.toggleDebug(not stgs.debug) end)
+    obj.AW.tglDebug = tglDebug
 end
 
 
@@ -132,11 +135,6 @@ function ActionWheel.setCamHeight(dir)
     end
 
     ActionWheel.titleUpdate(obj.AW.camHeight, "Высота камеры: §e"..stgs.camHeight.."\n§6Скролл")
-end
-
-
-function ActionWheel.toggleRender(tgl)
-    data.renderBox = tgl
 end
 
 
@@ -153,6 +151,7 @@ function ActionWheel.toggleStopwatch(tgl)
     end
 end
 
+
 function ActionWheel.toggleAutoClock(tgl)
     if tgl then
         data.isClocking = false
@@ -163,6 +162,17 @@ function ActionWheel.toggleAutoClock(tgl)
     else
         data.autoClock = false
         print("§cВыключен §fзапуск секундомера по газу")
+    end
+end
+
+
+function ActionWheel.toggleDebug(tgl)
+    if tgl then
+        stgs.debug = true
+        print("Debug is §2ON")
+    else
+        stgs.debug = false
+        print("Debug is §cOFF")
     end
 end
 

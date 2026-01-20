@@ -1,3 +1,5 @@
+local state = require("state")
+
 local Utility = {}
 
 local boats = {
@@ -61,5 +63,24 @@ function Utility.tprint(t, indent)
         end
     end
 end
+
+
+
+function Utility.smooth(a, b, k)
+    return a + (b - a) * k
+end
+
+
+
+local last = {}
+function Utility.dbg(key, text)
+  if not state.Settings.debug then return end
+
+  if last[key] == text then return end
+  last[key] = text
+
+  print("§5[DBG]§f "..text)
+end
+
 
 return Utility

@@ -14,11 +14,6 @@ local lastF, lastB, lastL, lastR = false, false, false, false   --?Pressed keys 
 local BOAT_RADIUS = 1.375 / 2
 
 
---*Function for smooth change of values
-local function smooth(current, target, factor)
-    return current + (target - current) * factor
-end
-
 
 --*Stopping wheels.
 local function stopWheels()
@@ -105,7 +100,7 @@ local function updateEngine(isAccelerating)
         data.engineRPM = data.engineRPM + rpmIncrease
     else
         local targetRPM = cfg.IDLE_RPM + (math.abs(data.speedMps) * 50 / cfg.gearRatio[data.currentGear])           --?Decrease RPM when pressed back or all unpressed
-        data.engineRPM = smooth(data.engineRPM, targetRPM, 0.3)
+        data.engineRPM = util.smooth(data.engineRPM, targetRPM, 0.3)
     end
 
     --.Limiter
@@ -152,7 +147,7 @@ local function updateSteering()
         targetAngle = math.max(-cfg.MAX_STEER_ANGLE, math.min(cfg.MAX_STEER_ANGLE, sidewaysSpeed * 20))
     end
 
-    data.steerAngle = smooth(data.steerAngle, targetAngle, cfg.STEERING_SMOOTHNESS) --?Smooth changing angle
+    data.steerAngle = util.smooth(data.steerAngle, targetAngle, cfg.STEERING_SMOOTHNESS) --?Smooth changing angle
 
 
     local factor = data.steerAngle / cfg.MAX_STEER_ANGLE        --?Applying steer to model
@@ -277,12 +272,16 @@ function Physic.tick()
         updateSteering()
         updateWheelRotation()
 
-        local status = underBoat(vehicle)
-        if status == "hopped" then
-            data.fuel = data.fuel - 1
-            
-        elseif status == "refueled" then
-            data.fuel = cfg.maxFuel
+        if host:isHost() then
+            local status = underBoat(vehicle)
+            util.dbg("under", "Fuel is: §9"..tostring(status))
+
+            if status == "hopped" then
+                data.fuel = math.max(0, data.fuel - 1)
+                
+            elseif status == "refueled" then
+                data.fuel = cfg.maxFuel
+            end
         end
 
         models.car.F1:setPos(0, 8, 0)

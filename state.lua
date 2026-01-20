@@ -189,6 +189,7 @@ State.Settings = {
     --.Any seetings for action wheel
     camHeight = -0.3,   --?Camera height in car
     renderDist = 9216,
+    debug = false,
 }
 
 
