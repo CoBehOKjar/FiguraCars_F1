@@ -1,8 +1,22 @@
 local State = {}
 
 
+State.Settings = {
+    --.Any seetings for action wheel
+    camHeight = -0.3,   --?Camera height in car
+    renderDist = 9216,  --?Distance of render boxes in blocks^2
+
+    --.Debugging
+    debugEvent = false,
+    debugTick = false,
+    debugTickTo = "ab", --?"ab" to actionbar, "ch" to chat
+}
+
+
 --*Objects
 State.Objects = {
+    AW = {},
+
     Driver = models.car.F1.Driver,                                                   --?Driver model
     DriverFP = models.car.F1.WorldRoot.DriverFP,                                     --?Driver model for firs person render
     F1 = models.car.F1.WorldRoot,                                                    --?Car model
@@ -10,6 +24,7 @@ State.Objects = {
     Units = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUIUnits,    --?Speedometer units display part
     Gear = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUIGear,      --?Speedometer gear display part
     RPM = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUIRPM,        --?Speedometer RPM display part
+    Fuel = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUIFuel,      --?Speedometer Fuel display part
 
     --?Input keys
     ACKEY = keybinds:fromVanilla("key.forward"),
@@ -23,7 +38,17 @@ State.Objects = {
 
     ACTIONKEY = keybinds:newKeybind("Kchau", "key.keyboard.k"),
 
-    AW = {}
+    --?Textures
+    ICO_PAGES = textures["ui.icons.iconPages"] or textures["car.F1.iconPages"],
+    ICO_SELECT = textures["ui.icons.iconSelect"] or textures["car.F1.iconSelect"],
+    ICO_BOX_RENDER = textures["ui.icons.iconBoxRender"] or textures["car.F1.iconBoxRender"],
+    ICO_AUTO_CLOCK = textures["ui.icons.iconAutoClock"] or textures["car.F1.iconAutoClock"],
+    ICO_STOPWATCH = textures["ui.icons.iconStopwatch"] or textures["car.F1.iconStopwatch"],
+    ICO_PRESETS = textures["ui.icons.iconPresets"] or textures["car.F1.iconPresets"],
+    ICO_CAMERA = textures["ui.icons.iconCamera"] or textures["car.F1.iconCamera"],
+    ICO_DEBUG_EVENT = textures["ui.icons.iconDebugEvent"] or textures["car.F1.iconDebugEvent"],
+    ICO_DEBUG_TICK = textures["ui.icons.iconDebugTick"] or textures["car.F1.iconDebugTick"], 
+    ICO_POTOM = textures["ui.icons.iconPotom"] or textures["car.F1.iconPotom"],
 }
 
 
@@ -70,6 +95,13 @@ State.Config = {
         vec(113/128,58/128)
     },
 
+    --?Pit stop blocks
+    REFUEL_BLOCKS = {
+        ["minecraft:black_concrete"] = true,
+        ["minecraft:yellow_concrete"] = true,
+    },
+    maxFuel = 384,  --?Max fuel
+
     --.RPM const
     IDLE_RPM = 4000,                    --?RPM when idle
     MAX_RPM = 13000,                    --?RPM up limit
@@ -94,14 +126,14 @@ State.Config = {
         [7] = 60,
         [8] = 70
     },
-    gearRatio = {                       --?Gear ratios
+    gearRatio = {
         [1] = 4.5,
         [2] = 3.2,
-        [3] = 2.4,
-        [4] = 1.9,
-        [5] = 1.5,
-        [6] = 1.2,
-        [7] = 1.0,
+        [3] = 2.5,
+        [4] = 2.0,
+        [5] = 1.6,
+        [6] = 1.3,
+        [7] = 1.1,
         [8] = 0.9
     },
 
@@ -121,6 +153,9 @@ State.Config = {
 --*Runtime
 State.Data = {
     --.Car states
+    fuel = 384,             --?Current fuel
+    lastUnderStatus = nil,
+
     engineRPM = 0,          --?Current RPM
     prevEngineRPM = 0,      --?RPM in last tick
     currentGear = 1,        --?Current gear
@@ -163,12 +198,6 @@ State.Input = {
     backState = false,  --?Backward (S)
     leftState = false,  --?Left     (A)
     rightState = false  --?Right    (D)
-}
-
-State.Settings = {
-    --.Any seetings for action wheel
-    camHeight = -0.3,   --?Camera height in car
-    renderDist = 9216,
 }
 
 

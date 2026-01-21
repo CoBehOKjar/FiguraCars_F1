@@ -1,6 +1,7 @@
 local state = require("state")
 local presets = require("presets")
 local render = require("ui.render")
+local util = require("lib.utilities")
 
 local Stopwatch = {}
 
@@ -47,6 +48,7 @@ function Stopwatch.selectPreset(dir)
 
     render.spawnEdgeParticles(cbx[1], cbx[2], player:getPos())
     print("Выбран бокс трассы №"..data.lastPreset..": §e'" .. presets.Boxes[data.lastPreset].name .. "'")
+    util.dbgEvent("AW", "Selected preset is §9"..tostring(data.lastPreset)..tostring(presets.Boxes[data.lastPreset].name))
 
     data.isCheckBoxCreated = true
 end
@@ -79,6 +81,7 @@ function Stopwatch.setBox(point, pos, expand)
     end
 
     sendToActionbar("§6Текущая область: "..vecToString(cbx[1]).." / "..vecToString(cbx[2]))
+    util.dbgEvent("SW", "Set §9pos"..tostring(point))
     render.spawnEdgeParticles(cbx[1], cbx[2], pos)
 
     data.isCheckBoxCreated = true
@@ -102,6 +105,7 @@ function Stopwatch.changeBox(dir)
 
     if not data.isCheckBoxCreated then
         resetBox(pos)
+        util.dbgEvent("SW", "Box is §9created")
         return
     end
 
@@ -111,12 +115,14 @@ function Stopwatch.changeBox(dir)
         cbx[2] = vec(0,0,0)
         data.isCheckBoxCreated = false
         sendToActionbar("§cЗона удалена")
+        util.dbgEvent("SW", "Box is §9deleted")
         return
     end
 
 
     if alt then             --?Reset box
         resetBox(pos)
+        util.dbgEvent("SW", "Box is §9reseted")
         return
     end
 
@@ -126,6 +132,7 @@ function Stopwatch.changeBox(dir)
         cbx[1] = cbx[1] - v
         cbx[2] = cbx[2] + v
         sendToActionbar("§6Текущая область: "..vecToString(cbx[1]).." / "..vecToString(cbx[2]))
+        util.dbgEvent("SW", "Changed box §9all axis")
         render.spawnEdgeParticles(cbx[1], cbx[2], pos)
         return
     end
@@ -142,6 +149,7 @@ function Stopwatch.changeBox(dir)
         end
 
         sendToActionbar("§6Текущая область: "..vecToString(cbx[1]).." / "..vecToString(cbx[2]))
+        util.dbgEvent("SW", "Changed box look dir axis §9"..tostring(mainAxis))
         render.spawnEdgeParticles(cbx[1], cbx[2], pos)
         return
     end
@@ -154,6 +162,7 @@ function Stopwatch.changeBox(dir)
     cbx[1] = cbx[1] - vz
     cbx[2] = cbx[2] + vz
     sendToActionbar("§6Текущая область: "..vecToString(cbx[1]).." / "..vecToString(cbx[2]))
+    util.dbgEvent("SW", "Changed box all dir axis §9"..tostring(mainAxis))
     render.spawnEdgeParticles(cbx[1], cbx[2], pos)
 end
 

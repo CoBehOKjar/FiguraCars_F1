@@ -11,12 +11,8 @@ local obj = state.Objects
 
 local lastF, lastB, lastL, lastR = false, false, false, false   --?Pressed keys in last tick
 
+local BOAT_RADIUS = 1.375 / 2
 
-
---*Function for smooth change of values
-local function smooth(current, target, factor)
-    return current + (target - current) * factor
-end
 
 
 --*Stopping wheels.
@@ -26,11 +22,59 @@ local function stopWheels()
 end
 
 
+--*Return block id in coords
+local function blockIdAt(x, y, z)
+    return world.getBlockState(vec(math.floor(x), math.floor(y), math.floor(z))):getID()
+end
+
+
+--*Check block and entity under boat
+local function underBoat(vehicle)
+    local pos = vehicle:getPos()
+
+    local x1 = pos.x - BOAT_RADIUS
+    local z1 = pos.z - BOAT_RADIUS
+    local x2 = pos.x + BOAT_RADIUS
+    local z2 = pos.z + BOAT_RADIUS
+
+    local y1 = pos.y - 1
+    local y2 = pos.y + 1
+
+    --.Check hopper minecart
+    local ents = world.getEntities(x1, y1, z1, x2, y2, z2)
+    for _, e in pairs(ents) do
+        if e and e.getType and e:getType() == "minecraft:hopper_minecart" then
+            return "hopped"
+        end
+    end
+
+    --.Check pit block
+    local checkY = pos.y - 1.0
+
+    local r = BOAT_RADIUS
+    local step = r
+
+    for ix = -1, 1 do
+        for iz = -1, 1 do
+            local px = pos.x + ix * step
+            local pz = pos.z + iz * step
+
+            local id = blockIdAt(px, checkY, pz)
+            if cfg.REFUEL_BLOCKS[id] then
+                return "refueled"
+            end
+        end
+    end
+
+    return nil
+end
+
+
 
 --*Update engine RPM and gear
 local function updateEngine(isAccelerating)
     --.Gears
-    if data.currentGear < 6 and data.engineRPM >= cfg.SHIFT_UP_RPM then                                                     --?Auto gear up
+    if data.currentGear < #cfg.gearRatio and data.engineRPM >= cfg.SHIFT_UP_RPM then                                                     --?Auto gear up
         data.currentGear = data.currentGear + 1
         data.engineRPM = cfg.SHIFT_UP_TARGET_RPM
         obj.EXFIRE:play()
@@ -56,7 +100,7 @@ local function updateEngine(isAccelerating)
         data.engineRPM = data.engineRPM + rpmIncrease
     else
         local targetRPM = cfg.IDLE_RPM + (math.abs(data.speedMps) * 50 / cfg.gearRatio[data.currentGear])           --?Decrease RPM when pressed back or all unpressed
-        data.engineRPM = smooth(data.engineRPM, targetRPM, 0.3)
+        data.engineRPM = util.smooth(data.engineRPM, targetRPM, 0.3)
     end
 
     --.Limiter
@@ -103,7 +147,7 @@ local function updateSteering()
         targetAngle = math.max(-cfg.MAX_STEER_ANGLE, math.min(cfg.MAX_STEER_ANGLE, sidewaysSpeed * 20))
     end
 
-    data.steerAngle = smooth(data.steerAngle, targetAngle, cfg.STEERING_SMOOTHNESS) --?Smooth changing angle
+    data.steerAngle = util.smooth(data.steerAngle, targetAngle, cfg.STEERING_SMOOTHNESS) --?Smooth changing angle
 
 
     local factor = data.steerAngle / cfg.MAX_STEER_ANGLE        --?Applying steer to model
@@ -191,7 +235,6 @@ function Physic.tick()
         data.inVehicle = false
     end
 
-
     --.Calculating updates
     if data.inVehicle then
         local f = obj.ACKEY:isPressed()                         --?Check pressed keys
@@ -208,9 +251,11 @@ function Physic.tick()
         if data.inWater and not data.wasInWater then
             obj.SWIMMING:play()
             obj.UNSWIMMING:stop()
+            util.dbgEvent("PHS", "Swiming: §9"..tostring(data.inWater))
         elseif not data.inWater and data.wasInWater then
             obj.UNSWIMMING:play()
             obj.SWIMMING:stop()
+            util.dbgEvent("PHS", "Swiming: §9"..tostring(data.inWater))
         end
         data.wasInWater = data.inWater
 
@@ -228,6 +273,23 @@ function Physic.tick()
         updateEngine(input.accelState)                  --?Updates
         updateSteering()
         updateWheelRotation()
+
+        if host:isHost() then
+            local status = underBoat(vehicle)
+            if status ~= data.lastUnderStatus then
+                util.dbgEvent("PHS", "Under: "..tostring(status))
+                data.lastUnderStatus = status
+            end
+            util.dbgTick({U = status})
+
+            if status == "hopped" then
+                data.fuel = math.max(0, data.fuel - 1)
+                
+            elseif status == "refueled" then
+                data.fuel = cfg.maxFuel
+            end
+        end
+
         models.car.F1:setPos(0, 8, 0)
     else
         obj.STEERING:stop()
@@ -238,6 +300,20 @@ function Physic.tick()
     end
 
     sound.tick()
+
+    if data.inVehicle ~= data.wasInVehicle then
+        util.dbgEvent("PHS", "In boat: §9"..tostring(data.inVehicle))
+    end
+
+    util.dbgTick({
+        S = string.format("%.2f", data.speedMps),
+        G = data.currentGear,
+        R = math.floor(data.engineRPM),
+        F = data.fuel,
+        W = data.inWater,
+        A = string.format("%.2f", data.acceleration),
+        I = (input.accelState and "W" or "-")..(input.backState and "S" or "-")..(input.leftState and "A" or "-")..(input.rightState and "D" or "-")
+    })
 
     data.wasInVehicle = data.inVehicle
     data.prevSpeedMps = data.speedMps

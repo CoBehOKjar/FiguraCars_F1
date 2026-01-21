@@ -1,4 +1,5 @@
 local state = require("state")
+local util = require("lib.utilities")
 
 local Sound = {}
 
@@ -19,11 +20,6 @@ local fadeOutActive = false     --?Fade out engine volume, when exit from vehicl
 local fadeSpeed = 0.08          --?Speed of fade out
 
 
---*Smooth.
-local function smooth(a, b, k)
-    return a + (b - a) * k
-end
-
 
 --*Meme
 function pings.kchau(pos, pitch)
@@ -31,12 +27,17 @@ function pings.kchau(pos, pitch)
         kchauSound:setPos(pos):setPitch(pitch):play()
     end
 end
-obj.ACTIONKEY.press = function () pings.kchau(player:getPos(), math.random(8, 15) / 10) end
+obj.ACTIONKEY.press = function()
+    local pitch = math.random(8, 15) / 10
+    pings.kchau(player:getPos(), pitch)
+    util.dbgEvent("SND", "Kchau pitch: "..pitch)
+end
 
 
 --*Stop engine sound
 function Sound.stopEngine()
     fadeOutActive = true
+    util.dbgEvent("SND", "Engine: §9disabling...")
 end
 
 
@@ -74,6 +75,7 @@ function Sound.startEngine(pos)
         :play()
 
     isEnginePlaying = true
+    util.dbgEvent("SND", "Engine: §9"..tostring(isEnginePlaying))
 end
 
 
@@ -108,7 +110,7 @@ function Sound.updateEngine(pos)
         targetPitch = targetPitch * dopplerFactor
     end
 
-    currentPitch = smooth(currentPitch, targetPitch, 0.2)
+    currentPitch = util.smooth(currentPitch, targetPitch, 0.2)
     engineLoop:setPitch(currentPitch)
 
 
@@ -124,6 +126,12 @@ function Sound.updateEngine(pos)
     end
     local waterVolumeFactor = data.inWater and 0.5 or 1.0
     engineLoop:setVolume(currentVolume * waterVolumeFactor)
+
+    util.dbgTick({
+        E = isEnginePlaying,
+        V = string.format("%.2f", currentVolume * waterVolumeFactor),
+        P = string.format("%.2f", currentPitch),
+    })
 end
 
 
@@ -147,6 +155,7 @@ function Sound.tick()
     elseif not data.inVehicle and data.wasInVehicle then
         Sound.stopEngine()
     end
+    
     Sound.updateEngine(player:getPos())
 end
 return Sound

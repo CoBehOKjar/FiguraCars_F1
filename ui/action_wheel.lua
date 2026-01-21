@@ -1,5 +1,6 @@
 local state = require("state")
 local stopwatch = require("lib.stopwatch")
+local util = require("lib.utilities")
 
 local ActionWheel = {}
 
@@ -30,19 +31,23 @@ function ActionWheel.init()
 
         local nav = wheel:newAction()   --?Creating navigation button
             :title("§6< §fПред / След §6>\n§7ПКМ/ЛКМ | Скролл\n§6"..wheel:getTitle())
-            :setTexture(textures["ui.icons.iconPages"], 0, 0, 16, 16)
-            :setHoverTexture(textures["ui.icons.iconPages"], 16, 0, 16, 16)
+            :setTexture(obj.ICO_PAGES, 0, 0, 16, 16)
+            :setHoverTexture(obj.ICO_PAGES, 16, 0, 16, 16)
             :onLeftClick(function()
                 action_wheel:setPage(wheels[prevIndex])
+                util.dbgEvent("AW", "Perv page")
             end)
             :onRightClick(function()
                 action_wheel:setPage(wheels[nextIndex])
+                util.dbgEvent("AW", "Next page")
             end)
             :setOnScroll(function(dir)
                 if dir > 0 then
                     action_wheel:setPage(wheels[nextIndex])
+                    util.dbgEvent("AW", "Next page")
                 else
                     action_wheel:setPage(wheels[prevIndex])
+                    util.dbgEvent("AW", "Perv page")
                 end
             end)
         obj.AW["Nav"..i] = nav
@@ -63,8 +68,8 @@ function ActionWheel.init()
             "§eCtrl§f+§aShift§f+§6скролл§c - Удалить выделение"
         )
 
-        :setTexture(textures["ui.icons.iconSelect"], 0, 0, 16, 16)
-        :setHoverTexture(textures["ui.icons.iconSelect"], 16, 0, 16, 16)
+        :setTexture(obj.ICO_SELECT, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_SELECT, 16, 0, 16, 16)
         :onLeftClick(function() stopwatch.setBox(1, player:getPos(), true) end)
         :onRightClick(function() stopwatch.setBox(2, player:getPos(), true) end)
         :onScroll(stopwatch.changeBox)
@@ -73,35 +78,38 @@ function ActionWheel.init()
 
     local tglRender = wheels[1]:newAction()
         :title("Постоянный рендер зоны секундомера\n§7ЛКМ")
-        :setTexture(textures["ui.icons.iconBoxRender"], 0, 0, 16, 16)
-        :setHoverTexture(textures["ui.icons.iconBoxRender"], 16, 0, 16, 16)
-        :setToggleTexture(textures["ui.icons.iconBoxRender"], 32, 0, 16, 16)
-        :onToggle(function() ActionWheel.toggleRender(not data.renderBox) end)
+        :setTexture(obj.ICO_BOX_RENDER, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_BOX_RENDER, 16, 0, 16, 16)
+        :setToggleTexture(obj.ICO_BOX_RENDER, 32, 0, 16, 16)
+        :onToggle(function()
+            data.renderBox = not data.renderBox
+            util.dbgEvent("AW", "Toggled box render")
+        end)
     obj.AW.tglRender = tglRender
  
     
     local tglAutoClock = wheels[1]:newAction()
         :title("Запуск секундомера по газу\n§7ЛКМ")
-        :setTexture(textures["ui.icons.iconAutoClock"], 0, 0, 16, 16)
-        :setHoverTexture(textures["ui.icons.iconAutoClock"], 16, 0, 16, 16)
-        :setToggleTexture(textures["ui.icons.iconAutoClock"], 32, 0, 16, 16)
-        :onToggle(function() ActionWheel.toggleAutoClock(not data.autoClock) end)
+        :setTexture(obj.ICO_AUTO_CLOCK, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_AUTO_CLOCK, 16, 0, 16, 16)
+        :setToggleTexture(obj.ICO_AUTO_CLOCK, 32, 0, 16, 16)
+        :onToggle(function()ActionWheel.toggleAutoClock(not data.autoClock) end)
     obj.AW.tglAutoClock = tglAutoClock   
 
 
     local tglStopwatch = wheels[1]:newAction()
         :title("Запустить / остановить секундомер\n§7ЛКМ")
-        :setTexture(textures["ui.icons.iconStopwatch"], 0, 0, 16, 16)
-        :setHoverTexture(textures["ui.icons.iconStopwatch"], 16, 0, 16, 16)
-        :setToggleTexture(textures["ui.icons.iconStopwatch"], 32, 0, 16, 16)
+        :setTexture(obj.ICO_STOPWATCH, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_STOPWATCH, 16, 0, 16, 16)
+        :setToggleTexture(obj.ICO_STOPWATCH, 32, 0, 16, 16)
         :onToggle(function () ActionWheel.toggleStopwatch(not data.isClocking) end)
     obj.AW.tglStopwatch = tglStopwatch
 
 
     local selectPreset = wheels[1]:newAction()
         :title("Выбрать пресет зоны секундомера\n§6Скролл")
-        :setTexture(textures["ui.icons.iconPresets"], 0, 0, 16, 16)
-        :setHoverTexture(textures["ui.icons.iconPresets"], 16, 0, 16, 16)
+        :setTexture(obj.ICO_PRESETS, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_PRESETS, 16, 0, 16, 16)
         :onScroll(stopwatch.selectPreset)
     obj.AW.selectPreset = selectPreset
 
@@ -110,16 +118,31 @@ function ActionWheel.init()
     --.Utilities wheel
     local camHeight = wheels[2]:newAction()
         :title("Высота камеры: §e"..stgs.camHeight.."\n§6Скролл")
-        :setTexture(textures["ui.icons.iconCamera"], 0, 0, 16, 16)
-        :setHoverTexture(textures["ui.icons.iconCamera"], 16, 0, 16, 16)
-        :setOnScroll(ActionWheel.setCamHeight)
+        :setTexture(obj.ICO_CAMERA, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_CAMERA, 16, 0, 16, 16)
+        :onScroll(ActionWheel.setCamHeight)
     obj.AW.camHeight = camHeight
 
+
+    
     --.Debug wheel
-    local tglDebug = wheels[3]:newAction()
-        :title("ПОТОМ\nСкоро\nКогда-нибудь\nЗавтра в 3")
-        :setTexture(textures["ui.icons.iconPotom"], 0, 0, nil, nil, 0.5)
-    obj.AW.camHeight = camHeight
+    local tglDebugEvent = wheels[3]:newAction()
+        :title("Debug event\n§7LMB")
+        :setTexture(obj.ICO_DEBUG_EVENT, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_DEBUG_EVENT, 16, 0, 16, 16)
+        :setToggleTexture(obj.ICO_DEBUG_EVENT, 32, 0, 16, 16)
+        :onToggle(function () ActionWheel.toggleDebugEvent(not stgs.debugEvent) end)
+    obj.AW.tglDebugEvent = tglDebugEvent
+
+
+    local tglDebugTick = wheels[3]:newAction()
+        :title("Debug tick\n§7LMB §f- Toggle\n§6Scroll §f- Change output between chat & actionbar")
+        :setTexture(obj.ICO_DEBUG_TICK, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_DEBUG_TICK, 16, 0, 16, 16)
+        :setToggleTexture(obj.ICO_DEBUG_TICK, 32, 0, 16, 16)
+        :onToggle(function () ActionWheel.toggleDebugTick(not stgs.debugTick) end)
+        :onScroll(ActionWheel.changeDebugTickOutput)
+    obj.AW.tglDebugTick = tglDebugTick
 end
 
 
@@ -132,11 +155,7 @@ function ActionWheel.setCamHeight(dir)
     end
 
     ActionWheel.titleUpdate(obj.AW.camHeight, "Высота камеры: §e"..stgs.camHeight.."\n§6Скролл")
-end
-
-
-function ActionWheel.toggleRender(tgl)
-    data.renderBox = tgl
+    util.dbgEvent("AW", "Changed camera height to §9"..tostring(stgs.camHeight))
 end
 
 
@@ -151,7 +170,9 @@ function ActionWheel.toggleStopwatch(tgl)
         data.lastTime = 0
         print("Секундомер §cостановлен")
     end
+    util.dbgEvent("AW", "Toggled stopwatch to §9"..tostring(data.isClocking))
 end
+
 
 function ActionWheel.toggleAutoClock(tgl)
     if tgl then
@@ -164,6 +185,39 @@ function ActionWheel.toggleAutoClock(tgl)
         data.autoClock = false
         print("§cВыключен §fзапуск секундомера по газу")
     end
+    util.dbgEvent("AW", "Toggled autoclock to §9"..tostring(data.autoClock))
+end
+
+
+function ActionWheel.toggleDebugEvent(tgl)
+    if tgl then
+        stgs.debugEvent = true
+    else
+        stgs.debugEvent = false
+    end
+    util.dbgEvent("AW", "Toggled debug event to §9"..tostring(stgs.debugEvent))
+end
+
+
+function ActionWheel.toggleDebugTick(tgl)
+    if tgl then
+        stgs.debugTick = true
+    else
+        stgs.debugTick = false
+    end
+    util.dbgEvent("AW", "Toggled debug tick to §9"..tostring(stgs.debugTick))
+end
+
+
+function ActionWheel.changeDebugTickOutput(dir)
+    if dir > 0 then
+        stgs.debugTickTo = "ab"
+        print("Debug tick sending to §dactionbar")
+    else
+        stgs.debugTickTo = "ch"
+        print("Debug tick sending to §dchat")
+    end
+    util.dbgEvent("AW", "Debug tick outout changed to §9"..tostring(stgs.debugTickTo))
 end
 
 return ActionWheel
