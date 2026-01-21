@@ -1,6 +1,18 @@
 local State = {}
 
 
+State.Settings = {
+    --.Any seetings for action wheel
+    camHeight = -0.3,   --?Camera height in car
+    renderDist = 9216,  --?Distance of render boxes in blocks^2
+
+    --.Debugging
+    debugEvent = false,
+    debugTick = false,
+    debugTickTo = "ab", --?"ab" to actionbar, "ch" to chat
+}
+
+
 --*Objects
 State.Objects = {
     AW = {},
@@ -34,6 +46,8 @@ State.Objects = {
     ICO_STOPWATCH = textures["ui.icons.iconStopwatch"] or textures["car.F1.iconStopwatch"],
     ICO_PRESETS = textures["ui.icons.iconPresets"] or textures["car.F1.iconPresets"],
     ICO_CAMERA = textures["ui.icons.iconCamera"] or textures["car.F1.iconCamera"],
+    ICO_DEBUG_EVENT = textures["ui.icons.iconDebugEvent"] or textures["car.F1.iconDebugEvent"],
+    ICO_DEBUG_TICK = textures["ui.icons.iconDebugTick"] or textures["car.F1.iconDebugTick"], 
     ICO_POTOM = textures["ui.icons.iconPotom"] or textures["car.F1.iconPotom"],
 }
 
@@ -184,15 +198,6 @@ State.Input = {
     backState = false,  --?Backward (S)
     leftState = false,  --?Left     (A)
     rightState = false  --?Right    (D)
-}
-
-State.Settings = {
-    --.Any seetings for action wheel
-    camHeight = -0.3,   --?Camera height in car
-    renderDist = 9216,
-    debugEvent = false,
-    debugTick = false,
-    debugTickTo = "ab", --?ab to actionbar, ch to chat
 }
 
 

@@ -128,14 +128,18 @@ function ActionWheel.init()
     --.Debug wheel
     local tglDebugEvent = wheels[3]:newAction()
         :title("Debug event\n§7LMB")
-        :setTexture(obj.ICO_POTOM, 0, 0, nil, nil, 0.5)
+        :setTexture(obj.ICO_DEBUG_EVENT, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_DEBUG_EVENT, 16, 0, 16, 16)
+        :setToggleTexture(obj.ICO_DEBUG_EVENT, 32, 0, 16, 16)
         :onToggle(function () ActionWheel.toggleDebugEvent(not stgs.debugEvent) end)
     obj.AW.tglDebugEvent = tglDebugEvent
 
 
     local tglDebugTick = wheels[3]:newAction()
         :title("Debug tick\n§7LMB §f- Toggle\n§6Scroll §f- Change output between chat & actionbar")
-        :setTexture(obj.ICO_POTOM, 0, 0, nil, nil, 0.5)
+        :setTexture(obj.ICO_DEBUG_TICK, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_DEBUG_TICK, 16, 0, 16, 16)
+        :setToggleTexture(obj.ICO_DEBUG_TICK, 32, 0, 16, 16)
         :onToggle(function () ActionWheel.toggleDebugTick(not stgs.debugTick) end)
         :onScroll(ActionWheel.changeDebugTickOutput)
     obj.AW.tglDebugTick = tglDebugTick

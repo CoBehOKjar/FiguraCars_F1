@@ -1,5 +1,9 @@
 --TODO  Разобраться со звуком при ливе
 --!     Невозможно.
+--TODO интегрировать GNUI
+--TODO партиклы
+--TODO комменты
+--TODO доработать пресеты
 local state = require("state")
 local stopwatch = require("lib.stopwatch")
 local action_wheel = require("ui.action_wheel")
