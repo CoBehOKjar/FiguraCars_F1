@@ -42,17 +42,16 @@ local function underBoat(vehicle)
 
     --.Check hopper minecart
     local ents = world.getEntities(x1, y1, z1, x2, y2, z2)
+    local hopCount = 0
     for _, e in pairs(ents) do
-        if e and e.getType and e:getType() == "minecraft:hopper_minecart" then
-            return "hopped"
+        if e:getType() == "minecraft:hopper_minecart" then
+            hopCount = hopCount + 1
         end
     end
 
     --.Check pit block
     local checkY = pos.y - 1.0
-
-    local r = BOAT_RADIUS
-    local step = r
+    local step = BOAT_RADIUS
 
     for ix = -1, 1 do
         for iz = -1, 1 do
@@ -61,12 +60,12 @@ local function underBoat(vehicle)
 
             local id = blockIdAt(px, checkY, pz)
             if cfg.REFUEL_BLOCKS[id] then
-                return "refueled"
+                return hopCount, true
             end
         end
     end
 
-    return nil
+    return hopCount, false
 end
 
 
@@ -275,18 +274,20 @@ function Physic.tick()
         updateWheelRotation()
 
         if host:isHost() then
-            local status = underBoat(vehicle)
-            if status ~= data.lastUnderStatus then
-                util.dbgEvent("PHS", "Under: "..tostring(status))
-                data.lastUnderStatus = status
-            end
-            util.dbgTick({U = status})
+            local hopCount, refueled = underBoat(vehicle)
 
-            if status == "hopped" then
-                data.fuel = math.max(0, data.fuel - 1)
-                
-            elseif status == "refueled" then
+            util.dbgTick({U = (refueled and ("R("..hopCount..")") or hopCount)})
+
+            local statusKey = (refueled and ("refueled:"..hopCount) or ("hopped:"..hopCount))
+            if statusKey ~= data.lastUnderStatus then
+                util.dbgEvent("PHS", "Under: "..statusKey)
+                data.lastUnderStatus = statusKey
+            end
+
+            if refueled then
                 data.fuel = cfg.maxFuel
+            elseif hopCount > 0 then
+                data.fuel = math.max(0, data.fuel - hopCount)
             end
         end
 

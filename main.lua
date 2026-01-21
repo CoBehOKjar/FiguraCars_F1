@@ -3,6 +3,7 @@
 --TODO партиклы
 --TODO комменты
 --TODO доработать пресеты
+--TODO инглиш мазафака
 local state = require("state")
 local stopwatch = require("lib.stopwatch")
 local action_wheel = require("ui.action_wheel")
