@@ -1,3 +1,4 @@
+config:setName("BolidF1")
 --TODO Разобраться со звуком при ливе
 --TODO интегрировать GNUI
 --TODO партиклы
@@ -14,6 +15,9 @@ local util = require("lib.utilities")
 
 
 local obj = state.Objects
+local data = state.Data
+local stgs = state.Settings
+local cfg = state.Config
 
 --*Entity initialization process
 function events.entity_init()
@@ -24,6 +28,12 @@ function events.entity_init()
     state.init()
     action_wheel.init()
     sound.init()
+
+    if data.IS_HOST and not stgs.notFirstLaunch then
+        print("Figura avatar F1 §3"..cfg.v)
+        print(cfg.helloMsg)
+        config:save("notFirstLaunch", true)
+    end
 end
 
 
@@ -36,6 +46,20 @@ function events.tick()
     stopwatch.tick()
 
     util.dbgTickFlush()
+
+    if data.IS_HOST then
+        if world.getTime() % 200 == 0 then
+            if stgs.engineVolume ~= data.lastEngineVolume then
+                config:save("engineVolume", stgs.engineVolume)
+            end
+            if stgs.camHeight ~= data.lastCamHeight then
+                config:save("camHeight", stgs.camHeight)
+            end
+
+            data.lastEngineVolume = stgs.engineVolume
+            data.lastCamHeight = stgs.camHeight
+        end
+    end
 end
 
 

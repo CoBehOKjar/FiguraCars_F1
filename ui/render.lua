@@ -12,11 +12,56 @@ local armorParts = { "LEGGINGS_BODY", "LEGGINGS_LEFT_LEG", "LEGGINGS_RIGHT_LEG",
 local segmentRPM = cfg.MAX_RPM / (#cfg.RPM_UV - 1)        --?RPM in one pixel of indicator on steering wheel
 local hasWheel = obj.Tens and obj.Units and obj.Gear and obj.RPM and obj.Fuel     --?Check, what steering wheel exist
 
+local colors = {
+    yellow = vec(0.941, 0.871, 0.11),
+    green  = vec(0.137, 0.839, 0.067),
+    orange = vec(0.941, 0.675, 0.157),
+    red    = vec(0.941, 0.227, 0.157),
+    off    = vec(0.961, 0.961, 0.961)
+}
+
+local function updateSectors()
+    local info = world.avatarVars()
+    local light = nil
+
+    for _, d in pairs(info) do
+        if d["TrackLights"] then
+            light = d["TrackLights"]
+            break
+        end
+    end
+
+    if not light then return end
+
+
+    if light.Red then 
+        obj.Sec1:setColor(colors.red)
+        obj.Sec2:setColor(colors.red)
+        obj.Sec3:setColor(colors.red)
+    elseif light.Orange then 
+        obj.Sec1:setColor(colors.orange)
+        obj.Sec2:setColor(colors.orange)
+        obj.Sec3:setColor(colors.orange)
+    else
+
+        if light.Sec1 then obj.Sec1:setColor(colors.yellow)
+        elseif light.Green then obj.Sec1:setColor(colors.green)
+        else obj.Sec1:setColor(colors.off) end
+
+        if light.Sec2 then obj.Sec2:setColor(colors.yellow)
+        elseif light.Green then obj.Sec2:setColor(colors.green)
+        else obj.Sec2:setColor(colors.off) end
+
+        if light.Sec3 then obj.Sec3:setColor(colors.yellow)
+        elseif light.Green then obj.Sec3:setColor(colors.green)
+        else obj.Sec3:setColor(colors.off) end
+    end
+end
 
 
 --*Updating speed on speedometer
 local function updateSpeed()
-    local speed = math.floor(math.abs(state.Data.speedMps)) --?Getting a natural speed number
+    local speed = math.floor(math.abs(state.Data.absSpeedMps)) --?Getting a natural speed number
 
     if speed > 99 then                                                      --?Max display speed
         speed = 99 
@@ -141,7 +186,10 @@ function Render.tick()
         updateGear()
         updateRPM()
         updateFuel()
-        
+        if data.IS_HOST then
+            updateSectors()
+        end
+
         --.Camera position update
         renderer:offsetCameraPivot(0, stgs.camHeight, 0)    --?Set camera height, what needed, when in car
         renderer:setEyeOffset(0, stgs.camHeight, 0)

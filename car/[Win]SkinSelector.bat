@@ -171,6 +171,9 @@ exit /b 0
 :done_ok
 popd >nul 2>&1
 echo.
+echo [!] Чтобы скин изменился у других игроков, повторно загрузи аватар в облако!
+echo [!] To make the skin change visible to other players, re-upload the avatar to the cloud!
+echo.
 pause
 exit /b 0
 

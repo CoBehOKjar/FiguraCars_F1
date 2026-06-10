@@ -1,3 +1,4 @@
+config:setName("BolidF1")
 local state = require("state")
 local stopwatch = require("lib.stopwatch")
 local util = require("lib.utilities")
@@ -21,7 +22,7 @@ function ActionWheel.init()
         action_wheel:newPage("Дебаг"),
     }
 
-    action_wheel:setPage(wheels[1]) --?Default active wheel
+    action_wheel:setPage(wheels[stgs.AWPage]) --?Default active wheel
 
 
     --.Adding navigation buttons to wheels
@@ -35,19 +36,32 @@ function ActionWheel.init()
             :setHoverTexture(obj.ICO_PAGES, 16, 0, 16, 16)
             :onLeftClick(function()
                 action_wheel:setPage(wheels[prevIndex])
+                stgs.AWPage = prevIndex
+                if data.IS_HOST then
+                    config:save("AWPage", stgs.AWPage)
+                end
                 util.dbgEvent("AW", "Perv page")
             end)
             :onRightClick(function()
                 action_wheel:setPage(wheels[nextIndex])
+                stgs.AWPage = nextIndex
+                if data.IS_HOST then
+                    config:save("AWPage", stgs.AWPage)
+                end
                 util.dbgEvent("AW", "Next page")
             end)
             :setOnScroll(function(dir)
                 if dir > 0 then
                     action_wheel:setPage(wheels[nextIndex])
+                    stgs.AWPage = nextIndex
                     util.dbgEvent("AW", "Next page")
                 else
                     action_wheel:setPage(wheels[prevIndex])
+                    stgs.AWPage = prevIndex
                     util.dbgEvent("AW", "Perv page")
+                end
+                if data.IS_HOST then
+                    config:save("AWPage", stgs.AWPage)
                 end
             end)
         obj.AW["Nav"..i] = nav
@@ -81,6 +95,7 @@ function ActionWheel.init()
         :setTexture(obj.ICO_BOX_RENDER, 0, 0, 16, 16)
         :setHoverTexture(obj.ICO_BOX_RENDER, 16, 0, 16, 16)
         :setToggleTexture(obj.ICO_BOX_RENDER, 32, 0, 16, 16)
+        :setToggleColor(0.769, 0.725, 0.725)
         :onToggle(function()
             data.renderBox = not data.renderBox
             util.dbgEvent("AW", "Toggled box render")
@@ -93,6 +108,7 @@ function ActionWheel.init()
         :setTexture(obj.ICO_AUTO_CLOCK, 0, 0, 16, 16)
         :setHoverTexture(obj.ICO_AUTO_CLOCK, 16, 0, 16, 16)
         :setToggleTexture(obj.ICO_AUTO_CLOCK, 32, 0, 16, 16)
+        :setToggleColor(0.769, 0.725, 0.725)
         :onToggle(function()ActionWheel.toggleAutoClock(not data.autoClock) end)
     obj.AW.tglAutoClock = tglAutoClock   
 
@@ -102,6 +118,7 @@ function ActionWheel.init()
         :setTexture(obj.ICO_STOPWATCH, 0, 0, 16, 16)
         :setHoverTexture(obj.ICO_STOPWATCH, 16, 0, 16, 16)
         :setToggleTexture(obj.ICO_STOPWATCH, 32, 0, 16, 16)
+        :setToggleColor(0.769, 0.725, 0.725)
         :onToggle(function () ActionWheel.toggleStopwatch(not data.isClocking) end)
     obj.AW.tglStopwatch = tglStopwatch
 
@@ -116,13 +133,31 @@ function ActionWheel.init()
 
 
     --.Utilities wheel
+    local helloMsg = wheels[2]:newAction()
+        :title("Повторить гайд по UI\n§7ЛКМ")
+        :setTexture(obj.ICO_HELP, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_HELP, 16, 0, 16, 16)
+        :setOnLeftClick(function () print("Figura avatar F1 §3"..cfg.v) print(cfg.helloMsg) end)
+    obj.AW.helloMsg = helloMsg
+
     local camHeight = wheels[2]:newAction()
-        :title("Высота камеры: §e"..stgs.camHeight.."\n§6Скролл")
+        :title("Высота камеры: §e"..stgs.camHeight.."\n§6Скролл\n§7ПКМ §f- Cброс")
         :setTexture(obj.ICO_CAMERA, 0, 0, 16, 16)
         :setHoverTexture(obj.ICO_CAMERA, 16, 0, 16, 16)
+        :setOnRightClick(function () ActionWheel.resetCamHaigth() end)
         :onScroll(ActionWheel.setCamHeight)
     obj.AW.camHeight = camHeight
 
+    local engineVolume = wheels[2]:newAction()
+        :title("Громкость двигателя: §e"..stgs.engineVolume.."\n§6Скролл\n§7ЛКМ §f- Мут\n§e(i) Звук меняется только у твоей машины!\nЗаглушить движки других игроков можно в:\nНастройки > Музыка и Звуки > Игроки")
+        :setTexture(obj.ICO_SOUND, 0, 0, 16, 16)
+        :setHoverTexture(obj.ICO_SOUND, 16, 0, 16, 16)
+        :setToggleTexture(obj.ICO_SOUND, 32, 0, 16, 16)
+        :setToggleColor(0.769, 0.725, 0.725)
+        :onScroll(ActionWheel.setEngineVolume)
+        :onToggle(function () ActionWheel.engineMute(not stgs.isMuted) end)
+        :setToggled(stgs.isMuted)
+    obj.AW.engineVolume = engineVolume
 
     
     --.Debug wheel
@@ -131,6 +166,7 @@ function ActionWheel.init()
         :setTexture(obj.ICO_DEBUG_EVENT, 0, 0, 16, 16)
         :setHoverTexture(obj.ICO_DEBUG_EVENT, 16, 0, 16, 16)
         :setToggleTexture(obj.ICO_DEBUG_EVENT, 32, 0, 16, 16)
+        :setToggleColor(0.769, 0.725, 0.725)
         :onToggle(function () ActionWheel.toggleDebugEvent(not stgs.debugEvent) end)
     obj.AW.tglDebugEvent = tglDebugEvent
 
@@ -140,11 +176,18 @@ function ActionWheel.init()
         :setTexture(obj.ICO_DEBUG_TICK, 0, 0, 16, 16)
         :setHoverTexture(obj.ICO_DEBUG_TICK, 16, 0, 16, 16)
         :setToggleTexture(obj.ICO_DEBUG_TICK, 32, 0, 16, 16)
+        :setToggleColor(0.769, 0.725, 0.725)
         :onToggle(function () ActionWheel.toggleDebugTick(not stgs.debugTick) end)
         :onScroll(ActionWheel.changeDebugTickOutput)
     obj.AW.tglDebugTick = tglDebugTick
 end
 
+
+
+function ActionWheel.resetCamHaigth()
+    stgs.camHeight = -0.3
+    ActionWheel.titleUpdate(obj.AW.camHeight, "Высота камеры: §e"..stgs.camHeight.."\n§6Скролл\n§7ПКМ §f- Cброс")
+end
 
 
 function ActionWheel.setCamHeight(dir)
@@ -154,8 +197,34 @@ function ActionWheel.setCamHeight(dir)
         stgs.camHeight = math.max(stgs.camHeight - 0.05, cfg.CAM_MIN_HEIG)
     end
 
-    ActionWheel.titleUpdate(obj.AW.camHeight, "Высота камеры: §e"..stgs.camHeight.."\n§6Скролл")
+    ActionWheel.titleUpdate(obj.AW.camHeight, "Высота камеры: §e"..stgs.camHeight.."\n§6Скролл\n§7ПКМ §f- Cброс")
     util.dbgEvent("AW", "Changed camera height to §9"..tostring(stgs.camHeight))
+end
+
+
+function ActionWheel.setEngineVolume(dir)
+    if dir > 0 then
+        stgs.engineVolume = math.min(stgs.engineVolume + 0.05, 1)
+    else
+        stgs.engineVolume = math.max(stgs.engineVolume - 0.05, 0)
+    end
+
+    ActionWheel.titleUpdate(obj.AW.engineVolume, "Громкость двигателя: §e"..stgs.engineVolume.."\n§6Скролл\n§7ЛКМ §f- Мут\n§e(i) Звук меняется только у твоей машины!\nЗаглушить движки других игроков можно в:\nНастройки > Музыка и Звуки > Игроки")
+    util.dbgEvent("AW", "Changed engine volume to §9"..tostring(stgs.engineVolume))
+end
+
+
+function ActionWheel.engineMute(tgl)
+    if tgl then
+        stgs.isMuted = true
+    else
+        stgs.isMuted = false
+    end
+
+    if data.IS_HOST then
+        config:save("isMuted", stgs.isMuted)
+    end
+    util.dbgEvent("AW", "Toggled engine mute to §9"..tostring(stgs.isMuted))
 end
 
 

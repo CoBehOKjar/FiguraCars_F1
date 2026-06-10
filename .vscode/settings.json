@@ -7,5 +7,6 @@
   ],
   "[lua]": {
     "editor.suggest.showDeprecated": false
-  }
+  },
+  "figura.librariesFolderPath": "/home/cobehok/.local/share/.minecraft/figura/avatars/libraries/"
 }
