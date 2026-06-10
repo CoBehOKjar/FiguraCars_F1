@@ -3,6 +3,7 @@ local util = require("lib.utilities")
 
 local Sound = {}
 
+local stgs = state.Settings
 local cfg = state.Config
 local data = state.Data
 local obj = state.Objects
@@ -56,7 +57,7 @@ end
 --*Play ignition sound, when you sit in vehicle
 function Sound.playIgnition(pos)
     if ignitionSound then
-        ignitionSound:setPos(pos):play()
+        ignitionSound:setPos(pos):setVolume(stgs.engineVolume):play()
     end
 end
 
@@ -90,7 +91,7 @@ function Sound.updateEngine(pos)
     targetPitch = 0.8 + norm * 1.2                                  --?Set the pitch depending on the RPM
 
 
-    if not host:isHost() then   --?Doppler effect for other players
+    if not data.IS_HOST then   --?Doppler effect for other players
         local vel = player:getVelocity()
         local viewer = client:getViewer()
         local viewerPos = viewer:getPos()
@@ -125,11 +126,15 @@ function Sound.updateEngine(pos)
         end 
     end
     local waterVolumeFactor = data.inWater and 0.5 or 1.0
-    engineLoop:setVolume(currentVolume * waterVolumeFactor)
+    if stgs.isMuted then
+        engineLoop:setVolume(0)
+    else
+        engineLoop:setVolume(currentVolume * waterVolumeFactor * stgs.engineVolume)
+    end
 
     util.dbgTick({
         E = isEnginePlaying,
-        V = string.format("%.2f", currentVolume * waterVolumeFactor),
+        V = string.format("%.2f", currentVolume * waterVolumeFactor * stgs.engineVolume),
         P = string.format("%.2f", currentPitch),
     })
 end

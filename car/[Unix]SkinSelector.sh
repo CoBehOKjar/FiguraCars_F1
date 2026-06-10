@@ -107,4 +107,8 @@ fi
 
 echo
 echo "[OK] Done."
+echo
+echo "[!] Чтобы скин изменился у других игроков, повторно загрузи аватар в облако!"
+echo "[!] To make the skin change visible to other players, re-upload the avatar to the cloud!"
+echo
 read -r -n 1 -s -p $'Press any key to exit...\n'

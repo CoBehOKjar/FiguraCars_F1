@@ -264,6 +264,7 @@ function Physic.tick()
         local bodyDir = vec(math.sin(yaw), 0, -math.cos(yaw))
         local flatVel = vec(velocity.x, 0, velocity.z)
 
+        data.absSpeedMps = velocity:length() * 20
         data.speedMps = flatVel:dot(bodyDir) * 20           --?Scalar velocity along the direction of motion
         data.acceleration = data.speedMps - data.prevSpeedMps   --?Calc acceleration
 
@@ -273,7 +274,7 @@ function Physic.tick()
         updateSteering()
         updateWheelRotation()
 
-        if host:isHost() then
+        if data.IS_HOST then
             local hopCount, refueled = underBoat(vehicle)
 
             util.dbgTick({U = (refueled and ("R("..hopCount..")") or hopCount)})
@@ -307,7 +308,7 @@ function Physic.tick()
     end
 
     util.dbgTick({
-        S = string.format("%.2f", data.speedMps),
+        S = string.format("%.2f : %.2f", data.speedMps, data.absSpeedMps),
         G = data.currentGear,
         R = math.floor(data.engineRPM),
         F = data.fuel,

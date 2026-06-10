@@ -1,10 +1,16 @@
+config:setName("BolidF1")
 local State = {}
 
 
 State.Settings = {
+    notFirstLaunch = config:load("notFirstLaunch") or false,
+    AWPage = config:load("AWPage") or 1,
     --.Any seetings for action wheel
-    camHeight = -0.3,   --?Camera height in car
+    camHeight = config:load("camHeight") or -0.3,   --?Camera height in car
     renderDist = 9216,  --?Distance of render boxes in blocks^2
+
+    engineVolume = config:load("engineVolume") or 1,
+    isMuted = config:load("isMuted") or false,
 
     --.Debugging
     debugEvent = false,
@@ -25,6 +31,9 @@ State.Objects = {
     Gear = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUIGear,      --?Speedometer gear display part
     RPM = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUIRPM,        --?Speedometer RPM display part
     Fuel = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUIFuel,      --?Speedometer Fuel display part
+    Sec1 = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUISec1,
+    Sec2 = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUISec2,
+    Sec3 = models.car.F1.WorldRoot.Car.Frame.SteeringWheel.SteeringWheelUISec3,
 
     --?Input keys
     ACKEY = keybinds:fromVanilla("key.forward"),
@@ -45,7 +54,9 @@ State.Objects = {
     ICO_AUTO_CLOCK = textures["ui.icons.iconAutoClock"] or textures["car.F1.iconAutoClock"],
     ICO_STOPWATCH = textures["ui.icons.iconStopwatch"] or textures["car.F1.iconStopwatch"],
     ICO_PRESETS = textures["ui.icons.iconPresets"] or textures["car.F1.iconPresets"],
+    ICO_HELP = textures["ui.icons.iconHelp"] or textures["car.F1.iconHelp"],
     ICO_CAMERA = textures["ui.icons.iconCamera"] or textures["car.F1.iconCamera"],
+    ICO_SOUND = textures["ui.icons.iconSound"] or textures["car.F1.iconSound"],
     ICO_DEBUG_EVENT = textures["ui.icons.iconDebugEvent"] or textures["car.F1.iconDebugEvent"],
     ICO_DEBUG_TICK = textures["ui.icons.iconDebugTick"] or textures["car.F1.iconDebugTick"], 
     ICO_POTOM = textures["ui.icons.iconPotom"] or textures["car.F1.iconPotom"],
@@ -54,18 +65,36 @@ State.Objects = {
 
 --*Const
 State.Config = {
+    v = "v1.2",
+    helloMsg = [[§nМикро гайд по UI§r:
+§61. Руль§r
+  • §eСпидометр§r - Циферки: Показывает текущую скорость
+  • §eИндикаторы§r - 6 точек по краям руля: Показывает текущий сигнал светофора на секторе трассы §7(Всего 3 сектора, индикаторы объединены попарно)§r
+  • §eТопливо§r - Оранжевая полоска: Показывает §oпримерное§r кол-во топлива (6 ст). Восполняется на бетоне пит-стопа §7(Фигура не имеет доступ к инвентарю лодки)§r
+  • §eПередача§r - Вертикальный столбик: Показывает текущую передачу 1-8 §7(Просто декор)§r
+  • §eОбороты§r - Последняя полоска: Показывает текущие обороты 4-13k §7(Просто декор)§r
+
+§62. Колесо действий§r
+  • §eСекундомер§r: Настройки секундомера. Паузы нет, при остановке время сбрасывается.
+  • §eУтилиты§r: Настройки высоты камеры в лодке и звука §lтвоей§r машины §7(Звуки других игроков возможно уменьшить только в настройках игры)§r
+  • §eДебаг§r: дебаг §7(дебаг)§r
+
+§7Если это сообщение не перестаёт показываться после первого использования модели и ты не менял сборку, то напиши в дс §6§o@cobehok.jar§r§r и в §f6-й строке§r файла §fstate.lua:§r
+    §3notFirstLaunch §f= §9config:§dload(§b"notFirstLaunch"§d) §for §4false
+§fзамени §4false§f на §atrue§f и заново загрузи аватар в облако]],
+
     --?Numbers UV coordinates for speedometer
     SPEED_UV = {
-        vec(123/128,40/128),
-        vec(123/128,45/128),
-        vec(123/128,50/128),
-        vec(123/128,55/128),
-        vec(123/128,60/128),
-        vec(123/128,65/128),
-        vec(123/128,70/128),
-        vec(123/128,75/128),
-        vec(123/128,80/128),
-        vec(123/128,85/128)
+        vec(125/128,40/128),
+        vec(125/128,45/128),
+        vec(125/128,50/128),
+        vec(125/128,55/128),
+        vec(125/128,60/128),
+        vec(125/128,65/128),
+        vec(125/128,70/128),
+        vec(125/128,75/128),
+        vec(125/128,80/128),
+        vec(125/128,85/128)
     },
 
     --?RPM scale UV coordinates for speedometer
@@ -152,6 +181,8 @@ State.Config = {
 
 --*Runtime
 State.Data = {
+    IS_HOST = host:isHost(),
+
     --.Car states
     fuel = 384,             --?Current fuel
     lastUnderStatus = nil,
@@ -161,6 +192,7 @@ State.Data = {
     currentGear = 1,        --?Current gear
     
     speedMps = 0,           --?Current speed
+    absSpeedMps = 0,
     prevSpeedMps = 0,       --?Speed in last tick
     acceleration = 0,       --?Current acceleration
     
@@ -190,6 +222,9 @@ State.Data = {
     renderBox = false,
 
     lastPreset = 1,
+
+    lastEngineVolume = State.Settings.engineVolume,
+    lastCamHeight = State.Settings.camHeight,
 }
 
 State.Input = {
