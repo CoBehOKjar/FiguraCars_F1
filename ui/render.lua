@@ -12,6 +12,7 @@ local armorParts = { "LEGGINGS_BODY", "LEGGINGS_LEFT_LEG", "LEGGINGS_RIGHT_LEG",
 local segmentRPM = cfg.MAX_RPM / (#cfg.RPM_UV - 1)        --?RPM in one pixel of indicator on steering wheel
 local hasWheel = obj.Tens and obj.Units and obj.Gear and obj.RPM and obj.Fuel     --?Check, what steering wheel exist
 
+local uiBuf = {}
 local colors = {
     yellow = vec(0.941, 0.871, 0.11),
     green  = vec(0.137, 0.839, 0.067),
@@ -118,6 +119,69 @@ end
 
 
 
+local function updateTelemetryUI()
+    -- Speed
+    local speed = math.floor(math.abs(state.Data.absSpeedMps or 0))
+    if speed > 99 then speed = 99 end
+    table.insert(uiBuf, string.format("⏩ §f%02d", speed))
+
+    -- Fuel
+    local fuelNorm = (data.fuel or 0) / (cfg.maxFuel or 1)
+    fuelNorm = math.max(0, math.min(1, fuelNorm))
+    
+    local totalBars = 20
+    local filled = math.floor(fuelNorm * totalBars + 0.5)
+    local empty = totalBars - filled
+    
+    local fuelStr = "🔥 §6" .. string.rep("|", filled) .. "§8" .. string.rep("|", empty)
+    table.insert(uiBuf, fuelStr)
+
+    -- Light
+    local info = world.avatarVars()
+    local light = nil
+    for _, d in pairs(info) do
+        if d["TrackLights"] then light = d["TrackLights"] break end
+    end
+
+    local c1, c2, c3 = "§7⏹", "§7⏹", "§7⏹" -- По умолчанию серые (выключены)
+    if light then
+        if light.Red then 
+            c1, c2, c3 = "§c⏹", "§c⏹", "§c⏹"
+        elseif light.Orange then 
+            c1, c2, c3 = "§6⏹", "§6⏹", "§6⏹"
+        else
+            c1 = light.Sec1 and "§e⏹" or (light.Green and "§a⏹" or "§7⏹")
+            c2 = light.Sec2 and "§e⏹" or (light.Green and "§a⏹" or "§7⏹")
+            c3 = light.Sec3 and "§e⏹" or (light.Green and "§a⏹" or "§7⏹")
+        end
+    end
+    table.insert(uiBuf, c1 .. c2 .. c3)
+
+    -- RPM
+    local rpm = math.floor(data.engineRPM or 0)
+    table.insert(uiBuf, string.format("⚡ §f%05d", rpm))
+
+    -- Gear
+    local gear = data.currentGear or "N"
+    table.insert(uiBuf, string.format("₸ §f%s", tostring(gear)))
+
+
+end
+
+local function updateActionbar()
+    updateTelemetryUI()
+
+    if #uiBuf == 0 then return end
+    local shouldRender = stgs.uiType == "always" or (stgs.uiType == "f5" and not renderer:isFirstPerson())
+
+    if shouldRender then
+        local text = table.concat(uiBuf, "  §8|§f  ")
+        host:setActionbar(text)
+    end
+
+    uiBuf = {}
+end
+
 function Render.spawnEdgeParticles(p1, p2, pos)
     local center = (p1 + p2) / 2
     local dist = (pos - center):lengthSquared()
@@ -193,6 +257,7 @@ function Render.tick()
         updateFuel()
         if data.IS_HOST then
             updateSectors()
+            updateActionbar()
         end
 
         --.Camera position update

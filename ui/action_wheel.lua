@@ -10,6 +10,9 @@ local obj = state.Objects
 local stgs = state.Settings
 local data = state.Data
 
+local modes = {"off", "f5", "always"}
+local modeIndices = { off = 1, f5 = 2, always = 3 }
+
 function ActionWheel.titleUpdate(action, title)
     action:setTitle(title)
 end
@@ -134,10 +137,11 @@ function ActionWheel.init()
 
     --.Utilities wheel
     local helloMsg = wheels[2]:newAction()
-        :title("Повторить гайд по UI\n§7ЛКМ")
+        :title("Интерфейс\n§7ЛКМ §f- Повторить гайд по UI\n§6Скролл §f- Дублирование в actionbar: §e"..stgs.uiType)
         :setTexture(obj.ICO_HELP, 0, 0, 16, 16)
         :setHoverTexture(obj.ICO_HELP, 16, 0, 16, 16)
         :setOnLeftClick(function () print("Figura avatar F1 §3"..cfg.v) print(cfg.helloMsg) end)
+        :onScroll(ActionWheel.setUIRenderType)
     obj.AW.helloMsg = helloMsg
 
     local camHeight = wheels[2]:newAction()
@@ -213,6 +217,18 @@ function ActionWheel.setEngineVolume(dir)
     util.dbgEvent("AW", "Changed engine volume to §9"..tostring(stgs.engineVolume))
 end
 
+function ActionWheel.setUIRenderType(dir)
+    local currentIdx = modeIndices[stgs.uiType] or 1
+    local nextIdx = (currentIdx + dir - 1) % 3 + 1
+    
+    stgs.uiType = modes[nextIdx]
+
+    ActionWheel.titleUpdate(obj.AW.helloMsg, "Интерфейс\n§7ЛКМ §f- Повторить гайд по UI\n§6Скролл §f- Дублирование в actionbar: §e"..stgs.uiType)
+    if data.IS_HOST then
+        config:save("uiType", stgs.uiType)
+    end
+    util.dbgEvent("AW", "Toggled ui render to §9"..tostring(stgs.uiType))
+end
 
 function ActionWheel.engineMute(tgl)
     if tgl then
