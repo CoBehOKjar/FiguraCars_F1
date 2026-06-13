@@ -5,6 +5,9 @@ local State = {}
 State.Settings = {
     notFirstLaunch = config:load("notFirstLaunch") or false,
     AWPage = config:load("AWPage") or 1,
+
+    uiType = config:load("uiType") or "f5", --?off/f5/always
+
     --.Any seetings for action wheel
     camHeight = config:load("camHeight") or -0.3,   --?Camera height in car
     renderDist = 9216,  --?Distance of render boxes in blocks^2
@@ -65,7 +68,7 @@ State.Objects = {
 
 --*Const
 State.Config = {
-    v = "v1.2",
+    v = "v1.4",
     helloMsg = [[§nМикро гайд по UI§r:
 §60. Персонаж§r
   • Что бы видеть руки и тело в машине от 1 лица, нужно в §eFigura§r в разделе §n'Paperdoll'§r включить настройки §n'Enable paperdoll'§r и §n'Always on'§r
