@@ -104,10 +104,15 @@ local function updateFuel()
     local fuelNorm = data.fuel / cfg.maxFuel
     fuelNorm = math.max(0, math.min(1, fuelNorm))
 
-    local fuelY = 0.1 + (1 - 0.1) * fuelNorm
+    if fuelNorm <= 0.2 then
+        local flash = (data.worldTime % 20 < 10) and 1 or 0
+        obj.Fuel:setColor(flash)
+    else
+        obj.Fuel:setColor(1)
+    end
 
     if hasWheel then
-        obj.Fuel:setScale(nil, fuelY, nil)
+        obj.Fuel:setScale(nil, fuelNorm, nil)
     end
 end
 

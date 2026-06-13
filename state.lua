@@ -184,6 +184,7 @@ State.Config = {
 --*Runtime
 State.Data = {
     IS_HOST = host:isHost(),
+    worldTime = 0,
 
     --.Car states
     fuel = 384,             --?Current fuel
