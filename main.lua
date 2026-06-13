@@ -41,6 +41,7 @@ end
 --*Tick process
 function events.tick()
     if not player:isLoaded() then return end
+    data.worldTime = world.getTime()
     physic.tick()
     render.tick()
     stopwatch.tick()
@@ -48,7 +49,7 @@ function events.tick()
     util.dbgTickFlush()
 
     if data.IS_HOST then
-        if world.getTime() % 200 == 0 then
+        if data.worldTime % 200 == 0 then
             if stgs.engineVolume ~= data.lastEngineVolume then
                 config:save("engineVolume", stgs.engineVolume)
             end
