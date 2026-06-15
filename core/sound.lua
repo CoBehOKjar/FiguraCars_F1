@@ -65,7 +65,7 @@ end
 
 --*Engine starting
 function Sound.startEngine(pos)
-    if not engineLoop or isEnginePlaying then return end
+    if not engineLoop then return end
     
     fadeOutActive = false
     currentVolume = 1
