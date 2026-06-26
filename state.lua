@@ -68,7 +68,7 @@ State.Objects = {
 
 --*Const
 State.Config = {
-    v = "v1.4",
+    v = "v1.5",
     helloMsg = [[§nМикро гайд по UI§r:
 §60. Персонаж§r
   • Что бы видеть руки и тело в машине от 1 лица, нужно в §eFigura§r в разделе §n'Paperdoll'§r включить настройки §n'Enable paperdoll'§r и §n'Always on'§r
