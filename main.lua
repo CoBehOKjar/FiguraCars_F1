@@ -1,10 +1,9 @@
 config:setName("BolidF1")
 --TODO Разобраться со звуком при ливе
 --TODO интегрировать GNUI
---TODO партиклы
+--TODO Пофиксить звук при удалении
 --TODO комменты
---TODO доработать пресеты
---TODO инглиш мазафака
+--TODO Сделать звуки тише
 local state = require("state")
 local stopwatch = require("lib.stopwatch")
 local action_wheel = require("ui.action_wheel")

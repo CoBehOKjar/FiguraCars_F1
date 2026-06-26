@@ -90,6 +90,7 @@ function Sound.updateEngine(pos)
     local norm = (data.engineRPM - cfg.IDLE_RPM) / (cfg.MAX_RPM - cfg.IDLE_RPM)
     targetPitch = 0.8 + norm * 1.2                                  --?Set the pitch depending on the RPM
 
+    local isFar = false
 
     if not data.IS_HOST then   --?Doppler effect for other players
         local vel = player:getVelocity()
@@ -101,6 +102,7 @@ function Sound.updateEngine(pos)
         local dist = dirVec:length()
         local dir = vec(0,0,0)
         if dist > 0 then dir = dirVec / dist end
+        if dist > 80 then isFar = true end
 
         local rel = (vel - viewerVel):dot(dir)
         local dopplerScale = 10.0
@@ -126,7 +128,7 @@ function Sound.updateEngine(pos)
         end 
     end
     local waterVolumeFactor = data.inWater and 0.5 or 1.0
-    if stgs.isMuted then
+    if stgs.isMuted or isFar then
         engineLoop:setVolume(0)
     else
         engineLoop:setVolume(currentVolume * waterVolumeFactor * stgs.engineVolume)
@@ -144,8 +146,8 @@ end
 --*Set loop to engine sound on initialization
 function Sound.init()
     engineLoop:setLoop(true)
-    engineLoop:setAttenuation(5)
-    kchauSound:setAttenuation(5)
+    engineLoop:setAttenuation(4)
+    kchauSound:setAttenuation(4)
 end
 
 
